@@ -151,11 +151,14 @@ input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;bac
 .seg input:checked+span{background:var(--panel);color:var(--fg);font-weight:500;box-shadow:0 0 0 1px var(--line),0 1px 2px rgba(0,0,0,.06)}
 .seg input:focus-visible+span{outline:2px solid var(--cut);outline-offset:1px}
 .colors{display:flex;align-items:center;gap:8px}
-.color{display:flex;align-items:center;gap:7px;flex:1 1 0;min-width:0;height:34px;padding:0 8px 0 5px;border-radius:8px;background:var(--field);font-family:var(--mono);font-size:11.5px;cursor:pointer}
-.color input{-webkit-appearance:none;appearance:none;flex:none;width:24px;height:24px;padding:0;border:1px solid var(--line-strong);border-radius:6px;background:none;cursor:pointer}
-.color input::-webkit-color-swatch-wrapper{padding:0}
-.color input::-webkit-color-swatch{border:0;border-radius:5px}
-.color input::-moz-color-swatch{border:0;border-radius:5px}
+.color{display:flex;align-items:center;gap:7px;flex:1 1 0;min-width:0;height:34px;padding:0 8px 0 5px;border-radius:8px;background:var(--field);font-family:var(--mono);font-size:11.5px}
+.color .hex{flex:1 1 0;min-width:0;width:100%;height:26px;padding:0 4px;border:1px solid transparent;border-radius:5px;background:none;outline:0;font-family:var(--mono);font-size:11.5px;color:var(--fg);text-transform:uppercase;cursor:text}
+.color .hex:focus{border-color:var(--fg);background:var(--panel)}
+.color .hex.bad{border-color:var(--warn)}
+.color input[type=color]{-webkit-appearance:none;appearance:none;flex:none;width:24px;height:24px;padding:0;border:1px solid var(--line-strong);border-radius:6px;background:none;cursor:pointer}
+.color input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.color input[type=color]::-webkit-color-swatch{border:0;border-radius:5px}
+.color input[type=color]::-moz-color-swatch{border:0;border-radius:5px}
 .icon-btn{display:grid;place-items:center;flex:none;width:28px;height:28px;padding:0;border:0;border-radius:7px;background:none;color:var(--muted)}
 .icon-btn:hover{background:var(--field);color:var(--fg)}
 .stats{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
@@ -272,6 +275,23 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
         <label class="opt"><span>내부 구멍 메우기<small>그림 안쪽 뚫린 곳에 칼선을 만들지 않습니다</small></span><input class="sw" id="holes" type="checkbox"></label>
       </section>
 
+      <section class="sec">
+        <div class="head"><h2>칼선 고치기</h2><span class="hint" id="ed-count">고친 곳 없음</span></div>
+        <div class="seg" role="radiogroup" aria-label="도구">
+          <label><input type="radio" name="tool" id="tool-move" checked><span>이동</span></label>
+          <label><input type="radio" name="tool" id="tool-brush"><span>브러시</span></label>
+          <label><input type="radio" name="tool" id="tool-erase"><span>지우개</span></label>
+          <label><input type="radio" name="tool" id="tool-push"><span>밀기</span></label>
+        </div>
+        <div class="field" id="f-brush" hidden>
+          <div class="row"><label for="bs" id="bs-label">굵기</label><span class="num"><input id="bs-n" type="number" min="0.5" max="15" step="0.5" aria-label="브러시 굵기 mm">mm</span></div>
+          <input id="bs" type="range" min="0.5" max="15" step="0.5">
+          <p class="hint" id="tool-hint"></p>
+        </div>
+        <div class="btns"><button class="btn mini" id="btn-ed-undo" type="button">한 획 되돌리기</button><button class="btn mini" id="btn-ed-clear" type="button">고친 것 모두 지우기</button></div>
+        <p class="hint">단축키: <kbd>B</kbd> 브러시, <kbd>E</kbd> 지우개, <kbd>W</kbd> 밀기, <kbd>V</kbd> 이동, <kbd>[</kbd> <kbd>]</kbd> 굵기, <kbd>Ctrl</kbd>+<kbd>Z</kbd> 한 획 되돌리기. 고친 내용은 이 이미지에만 적용됩니다.</p>
+      </section>
+
       <section class="sec" data-for="keyring korotto">
         <h2 id="acr-title">아크릴</h2>
         <label class="opt" data-for="keyring"><span>고리 구멍<small>키링용. 그림 맨 위에 자동으로 놓이고, 캔버스에서 끌어 옮길 수 있습니다</small></span><input class="sw" id="hole" type="checkbox"></label>
@@ -338,7 +358,7 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
             <input id="ws" type="range" min="0" max="0.5" step="0.05">
             <p class="hint">인쇄가 밀려도 흰색이 삐져나오지 않게 안쪽으로 줄이는 폭</p>
           </div>
-          <div class="row"><span class="l">표시 색</span><label class="color" style="flex:0 0 132px"><input type="color" id="wc" aria-label="화이트 표시 색"><span id="wc-hex"></span></label></div>
+          <div class="row"><span class="l">표시 색</span><div class="color" style="flex:0 0 132px"><input type="color" id="wc" aria-label="화이트 표시 색 고르기"><input class="hex" type="text" id="wc-hex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="화이트 표시 색 색상 코드"></div></div>
           <label class="opt"><span>화이트 미리 보기<small>화이트가 들어갈 자리를 그림 위에 표시 색으로 덮어 보여 줍니다</small></span><input class="sw" id="wprev" type="checkbox"></label>
         </div>
       </section>
@@ -353,9 +373,9 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
         </div>
         <p class="hint" id="bg-none-note">칼선 안쪽 여백을 색으로 채웁니다. 그림 뒤에 깔립니다.</p>
         <div class="colors" id="f-colors">
-          <label class="color"><input type="color" id="c1" aria-label="배경색 1"><span id="c1-hex"></span></label>
+          <div class="color"><input type="color" id="c1" aria-label="배경색 1 고르기"><input class="hex" type="text" id="c1-hex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="배경색 1 색상 코드"></div>
           <button class="icon-btn" id="btn-swap" type="button" aria-label="두 색 맞바꾸기" title="두 색 맞바꾸기"><svg class="ic" viewBox="0 0 16 16"><path d="M3 5.5h10M10.5 3 13 5.5 10.5 8M13 10.5H3M5.5 8 3 10.5 5.5 13"/></svg></button>
-          <label class="color" id="f-c2"><input type="color" id="c2" aria-label="배경색 2"><span id="c2-hex"></span></label>
+          <div class="color" id="f-c2"><input type="color" id="c2" aria-label="배경색 2 고르기"><input class="hex" type="text" id="c2-hex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="배경색 2 색상 코드"></div>
         </div>
         <div class="field" id="f-ang">
           <div class="row"><label for="ang">방향</label><span class="num"><input id="ang-n" type="number" min="0" max="360" step="1" aria-label="그라데이션 방향 도">°</span></div>
@@ -413,13 +433,13 @@ const $ = id => document.getElementById(id);
 // S는 지금 캔버스에 올라온 이미지의 작업 상태. 목록의 각 이미지는 items에 있고 load/store로 S와 주고받는다.
 const G = { margin:2, smooth:1, relax:.5, holes:true, thr:10, hole:false, hw:2, rings:[{ x:.5, y:-.04, auto:true, d:3, l:0 }], base:false, bw:70, bh:4, bx:0, bd:0, thin:false, tw:2, bflip:true, dpi:300, bg:'none', c1:'#ffd6ea', c2:'#c9ecff', ang:90, bleed:1, rx:.5, ry:.5, rr:100, white:false, ws:.2, wc:'#000000' };   // 전체 공통 설정
 const items = []; let cur = 0, busy = false;
-const IF = ['img','w','h','name','file','dataUrl','isSample','alpha','alphaKey','loops','path','bleedLoops','bleedPath','opaque','box','holeHit','whitePath','thinMap','thinN','baseSpan','back','mis','misAlt'], SK = ['margin','smooth','relax','holes','thr','hole','hw','rings','base','bw','bh','bx','bd','thin','tw','bflip'], BK = ['bg','c1','c2','ang','bleed','rx','ry','rr','white','ws','wc'];
+const IF = ['img','w','h','name','file','dataUrl','isSample','alpha','alphaKey','loops','path','bleedLoops','bleedPath','opaque','box','holeHit','whitePath','thinMap','thinN','baseSpan','back','mis','misAlt','edits'], SK = ['margin','smooth','relax','holes','thr','hole','hw','rings','base','bw','bh','bx','bd','thin','tw','bflip'], BK = ['bg','c1','c2','ang','bleed','rx','ry','rr','white','ws','wc'];
 const cp = (k, v) => k === 'rings' ? v.map(g => ({ ...g })) : v;   // 구멍 목록은 설정끼리 공유되지 않게 복사한다
 const S = { img:null, w:0, h:0, name:'sample', isSample:true, file:null, dataUrl:null,
   dpi:300, margin:2, smooth:1, relax:.5, holes:true, thr:10, hole:false, hw:2, rings:[{ x:.5, y:-.04, auto:true, d:3, l:0 }], base:false, bw:70, bh:4, bx:0, bd:0, thin:false, tw:2, bflip:true, bg:'none', c1:'#ffd6ea', c2:'#c9ecff', ang:90, bleed:1, rx:.5, ry:.5, rr:100, white:false, ws:.2, wc:'#000000',
   showCut:true, spaceHide:false, paper:true, nodes:false,
   loops:[], path:null, bleedLoops:null, bleedPath:null, box:null, holeHit:false, alpha:null, alphaKey:'', opaque:false,
-  view:{scale:1, ox:0, oy:0}, moved:false, sel:0, hd:3, hl:0, wprev:false, side:'front', back:null, mis:0, misAlt:0, whitePath:null, thinMap:null, thinN:0, baseSpan:null };
+  view:{scale:1, ox:0, oy:0}, moved:false, sel:0, hd:3, hl:0, edits:[], tool:'move', bs:3, stroke:null, hover:null, warp:null, near:null, dense:null, wprev:false, side:'front', back:null, mis:0, misAlt:0, whitePath:null, thinMap:null, thinN:0, baseSpan:null };
 const INF = 1e20, CUT_HEX = '#EC008C';
 const pxmm = () => S.dpi / 25.4;
 
@@ -533,6 +553,42 @@ function holeGeom(g){
   const b = S.box, k = pxmm();
   return { cx:b.x0 + g.x*(b.x1 - b.x0), cy:b.y0 + g.y*(b.y1 - b.y0), r:g.d / 2 * k, R:(g.d / 2 + S.hw) * k, hl:g.l / 2 * k };   // hl: 길쭉한 구멍의 반 길이
 }
+// 손으로 고친 획을 순서대로 반영한다. 브러시(add)는 그 자리를 모양에 더하고, 지우개는 뺀다. 획은 원본 px 좌표의 점들과 반지름
+function fillPoly(v, W, H, Q, val){   // 짝홀 규칙으로 다각형 안쪽 칸을 채운다
+  let y0 = H, y1 = 0; for (const q of Q){ if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; }
+  for (let y = Math.max(0, Math.floor(y0)); y <= Math.min(H - 1, Math.ceil(y1)); y++){
+    const yc = y + .5, xs = [];
+    for (let i = 0, n = Q.length; i < n; i++){ const a = Q[i], b = Q[(i + 1) % n]; if ((a[1] <= yc) !== (b[1] <= yc)) xs.push(a[0] + (yc - a[1]) * (b[0] - a[0]) / (b[1] - a[1])); }
+    xs.sort((a, b) => a - b);
+    for (let k = 0; k + 1 < xs.length; k += 2) for (let x = Math.max(0, Math.ceil(xs[k] - .5)); x <= Math.min(W - 1, Math.floor(xs[k + 1] - .5)); x++) v[y*W + x] = val;
+  }
+}
+function fillDisc(v, W, H, cx, cy, r, val){
+  for (let y = Math.max(0, Math.floor(cy - r)); y <= Math.min(H - 1, Math.ceil(cy + r)); y++) for (let x = Math.max(0, Math.floor(cx - r)); x <= Math.min(W - 1, Math.ceil(cx + r)); x++)
+    if ((x + .5 - cx)**2 + (y + .5 - cy)**2 <= r*r) v[y*W + x] = val;
+}
+function applyEdits(v, W, H, pad, sx, sy, s, ed, grow){
+  for (const e of ed){
+    if (e.old){
+      // 밀고 당기기: 옮기기 전 선(old)과 옮긴 뒤 선(neu) 사이를 더하거나 뺀다.
+      // old의 세 번째 값은 그 점 주변을 같이 덮는 반지름으로, 나중에 여백이 달라져도 틈이나 찌꺼기가 남지 않게 한다
+      const val = e.add ? 1 : 0, g = q => [q[0]*sx + pad, q[1]*sy + pad];
+      fillPoly(v, W, H, e.old.map(g).concat(e.neu.map(g).reverse()), val);
+      for (const q of e.old) if (q[2] > 0) fillDisc(v, W, H, q[0]*sx + pad, q[1]*sy + pad, q[2] * s, val);
+      if (grow) for (const q of e.neu) fillDisc(v, W, H, q[0]*sx + pad, q[1]*sy + pad, Math.abs(grow) * s, grow > 0 ? 1 : 0);
+      continue;
+    }
+    const r = Math.max(.6, (e.add ? e.r + grow : e.r - grow) * s), r2 = r*r, val = e.add ? 1 : 0, P = e.pts;
+    for (let i = 0; i < Math.max(1, P.length - 1); i++){
+      const a = P[i], b = P[i + 1] || a, ax = a[0]*sx + pad, ay = a[1]*sy + pad, bx = b[0]*sx + pad, by = b[1]*sy + pad, dx = bx - ax, dy = by - ay, l2 = dx*dx + dy*dy;
+      const x0 = Math.max(0, Math.floor(Math.min(ax, bx) - r)), x1 = Math.min(W - 1, Math.ceil(Math.max(ax, bx) + r)), y0 = Math.max(0, Math.floor(Math.min(ay, by) - r)), y1 = Math.min(H - 1, Math.ceil(Math.max(ay, by) + r));
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++){
+        const px = x + .5 - ax, py = y + .5 - ay; let t = l2 ? (px*dx + py*dy) / l2 : 0; t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const qx = px - t*dx, qy = py - t*dy; if (qx*qx + qy*qy <= r2) v[y*W + x] = val;
+      }
+    }
+  }
+}
 // 평평한 바닥: 모양의 맨 아래에 맞춰 사각형을 더한다. 뒤이은 수축(r)을 견디도록 r만큼 키워서 넣는다
 function addBase(v, W, H, r, s){
   let xa = W, xb = -1, yb = -1;
@@ -562,6 +618,8 @@ function trace(marginMm, cut){
   for (const g of rings) if (g.auto) autoHole(g, alpha, gw, gh, sx, sy, thr);
   const hs = rings.map(holeGeom);
   let extra = S.base ? S.bd * pxmm() * s : 0;
+  const ed = S.edits || [], grow = (marginMm - S.margin) * pxmm();   // 도련·화이트용 외곽선은 칠한 획도 같은 만큼 넓히거나 줄인다
+  for (const e of ed) if (e.add) for (const q of e.pts || e.neu) extra = Math.max(extra, Math.max(0, -q[0] * sx, -q[1] * sy, q[0] * sx - gw, q[1] * sy - gh) + ((e.r || 0) + Math.max(0, grow)) * s);
   for (const q of hs){ const gx = q.cx * sx, gy = q.cy * sy; extra = Math.max(extra, Math.max(0, -gx, -gy, gx - gw, gy - gh) + (q.R + q.hl) * s); }
   const pad = Math.ceil(m + r + extra) + 4, W = gw + 2*pad, H = gh + 2*pad, N = W*H;
   const f = new Float64Array(N).fill(INF);
@@ -589,6 +647,7 @@ function trace(marginMm, cut){
     edtSq(f, W, H);
     const r2 = r*r; for (let i = 0; i < N; i++) if (v[i] && f[i] <= r2) v[i] = 0;
   }
+  if (ed.length) applyEdits(v, W, H, pad, sx, sy, s, ed, grow);
   if (cut){ S.thinMap = null; S.thinN = 0; if (S.thin) thinCheck(v, W, H, pad, sx, sy, S.tw / 2 * pxmm() * s); }
   // 윤곽 점 간격이 약 0.9칸이라 mm를 점 개수로 바꿀 때 나눈다
   const res = contour(v, W, H, pad, sx, sy, s, S.holes, S.relax * pxmm() * s / .9);
@@ -795,6 +854,20 @@ function draw(){
       for (const { pts } of S.loops) for (const p of pts){ ctx.fillRect(p[0]-q, p[1]-q, 2*q, 2*q); ctx.strokeRect(p[0]-q, p[1]-q, 2*q, 2*q); }
     }
   }
+  if (S.stroke){   // 긋는 중인 획
+    const k = S.stroke; ctx.strokeStyle = k.add ? 'rgba(230,0,126,.38)' : 'rgba(20,26,24,.38)'; ctx.lineWidth = 2 * k.r; ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.beginPath(); k.pts.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); if (k.pts.length === 1) ctx.lineTo(k.pts[0][0] + .01, k.pts[0][1]); ctx.stroke(); ctx.lineCap = 'butt';
+  }
+  if (S.warp){   // 밀고 당기는 중인 선
+    const k = S.warp; ctx.strokeStyle = css('--cut'); ctx.lineWidth = 2.5 / v.scale; ctx.lineJoin = 'round'; ctx.beginPath();
+    k.pts.forEach((q, i) => { const x = q[0] + k.d[0]*k.w[i], y = q[1] + k.d[1]*k.w[i]; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); ctx.stroke();
+  } else if (S.tool === 'push' && S.near){   // 잡을 수 있는 자리
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#141a18'; ctx.lineWidth = 1.5 / v.scale; ctx.beginPath(); ctx.arc(S.near[0], S.near[1], 5 / v.scale, 0, 7); ctx.fill(); ctx.stroke();
+  }
+  if (S.tool !== 'move' && S.hover && !S.warp){   // 브러시 크기 표시 (밀기에서는 같이 따라오는 범위)
+    const r = S.bs * pxmm() * (S.tool === 'push' ? 2 : 1);
+    for (const [col, lw] of [['rgba(255,255,255,.9)', 3], [S.tool === 'erase' ? '#141a18' : '#e6007e', 1.25]]){ ctx.strokeStyle = col; ctx.lineWidth = lw / v.scale; ctx.beginPath(); ctx.arc(S.hover[0], S.hover[1], r, 0, 7); ctx.stroke(); }
+  }
   // 방사형 중심 손잡이와 퍼지는 범위
   const hp = S.spaceHide ? null : handlePos();
   if (hp){
@@ -836,6 +909,72 @@ function autoHole(g, alpha, gw, gh, sx, sy, thr){
       return;
     }
   }
+}
+/* ---------- 브러시 / 지우개 ---------- */
+const painting = () => !SH.on && (S.tool === 'brush' || S.tool === 'erase') && !!S.img;
+const toArt = e => { const r = cv.getBoundingClientRect(), v = S.view; return [(e.clientX - r.left - v.ox) / v.scale, (e.clientY - r.top - v.oy) / v.scale]; };
+function paintStart(e){
+  if (!painting() || e.button > 0) return null;
+  S.stroke = { add:S.tool === 'brush', r:S.bs * pxmm(), pts:[toArt(e).map(n => Math.round(n * 10) / 10)] }; S.hover = toArt(e); draw(); return { t:'paint' };
+}
+function paintMove(e){
+  const q = toArt(e), k = S.stroke, l = k.pts[k.pts.length - 1]; S.hover = q;
+  if (Math.hypot(q[0] - l[0], q[1] - l[1]) >= Math.max(1, k.r / 4)) k.pts.push(q.map(n => Math.round(n * 10) / 10));
+  draw();
+}
+function paintEnd(){
+  const k = S.stroke, it = items[cur]; S.stroke = null; if (!k || !it) return;
+  S.edits.push(k); it.edits = S.edits; it.dirty = true; syncEdits(); update();
+}
+// 밀고 당기기: 칼선의 한 곳을 잡고 끌면 선을 따라 가까운 부분이 같이 움직인다
+function denseLoops(){   // 칼선을 0.25 mm 간격의 점으로 잘게 나눈 것
+  if (S.dense && S.dense.src === S.loops) return S.dense.list;
+  const step = Math.max(1, .25 * pxmm()), list = [];
+  for (const L of S.loops){
+    if (L.slot) continue; const out = [], n = L.pts.length;
+    for (let i = 0; i < n; i++){ const a = L.pts[i], b = L.pts[(i + 1) % n], k = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / step)); for (let j = 0; j < k; j++) out.push([a[0] + (b[0] - a[0]) * j / k, a[1] + (b[1] - a[1]) * j / k]); }
+    list.push(out);
+  }
+  S.dense = { src:S.loops, list }; return list;
+}
+function nearestOutline(q){
+  let best = null, bd = (14 / S.view.scale) ** 2;
+  denseLoops().forEach((pts, li) => { for (let i = 0; i < pts.length; i++){ const d = (pts[i][0] - q[0])**2 + (pts[i][1] - q[1])**2; if (d < bd){ bd = d; best = { li, i }; } } });
+  return best;
+}
+function warpStart(e){
+  if (SH.on || S.tool !== 'push' || e.button > 0 || !S.loops.length) return null;
+  const q = toArt(e), n = nearestOutline(q); if (!n) return null;
+  const pts = denseLoops()[n.li], N = pts.length, R = S.bs * pxmm() * 2, seg = pts.map((a, i) => { const b = pts[(i + 1) % N]; return Math.hypot(b[0] - a[0], b[1] - a[1]); });
+  const total = seg.reduce((a, b) => a + b, 0), w = new Array(N).fill(0); w[n.i] = 1; let acc = 0;
+  for (let k = 1; k < N; k++){ acc += seg[(n.i + k - 1) % N]; const d = Math.min(acc, total - acc); w[(n.i + k) % N] = d < R ? (1 - (d / R)**2)**2 : 0; }   // 선을 따라 잰 거리로 따라오는 정도를 정한다
+  S.warp = { pts, w, i:n.i, start:q, d:[0, 0] }; S.near = null; return { t:'warp' };
+}
+function warpMove(e){ const q = toArt(e), k = S.warp; k.d = [q[0] - k.start[0], q[1] - k.start[1]]; S.hover = q; draw(); }
+function warpEnd(){
+  const k = S.warp, it = items[cur]; S.warp = null; if (!k || !it) return;
+  const [dx, dy] = k.d, len = Math.hypot(dx, dy), N = k.pts.length; if (len < .5 || !S.path){ draw(); return; }
+  let a = k.i, b = k.i, c = 0;
+  while (c++ < N / 2 && k.w[(a - 1 + N) % N] > 0) a = (a - 1 + N) % N;
+  c = 0; while (c++ < N / 2 && k.w[(b + 1) % N] > 0) b = (b + 1) % N;
+  a = (a - 1 + N) % N; b = (b + 1) % N;   // 움직이지 않는 점을 양 끝에 하나씩 넣어 선이 원래 칼선과 이어지게 한다
+  const idx = []; for (let j = a, g = 0; g < N; j = (j + 1) % N, g++){ idx.push(j); if (j === b) break; }
+  const rho = Math.min(1.5 * pxmm(), .9 * len), r1 = n => Math.round(n * 10) / 10, ap = k.pts[k.i];
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const add = !ctx.isPointInPath(S.path, ap[0] + dx, ap[1] + dy, 'evenodd');   // 끌어 놓은 자리가 모양 밖이면 넓히기, 안이면 깎기
+  // 기준선(old)을 끈 방향의 반대쪽으로 물려 둔다. 나중에 여백을 바꿔 칼선이 안팎으로 움직여도 고친 자리가 그대로 남는다
+  const back = (add ? 3 : 8) * pxmm(), ux = dx / len, uy = dy / len;
+  S.edits.push({ add, old:idx.map(j => [r1(k.pts[j][0] - ux * back * k.w[j]), r1(k.pts[j][1] - uy * back * k.w[j]), r1(rho * k.w[j])]), neu:idx.map(j => [r1(k.pts[j][0] + dx * k.w[j]), r1(k.pts[j][1] + dy * k.w[j])]) });
+  it.edits = S.edits; it.dirty = true; syncEdits(); update();
+}
+function undoEdit(){ if (SH.on || !S.edits.length) return; S.edits.pop(); syncEdits(); update(); }
+function clearEdits(){ if (!S.edits.length) return; S.edits.length = 0; syncEdits(); update(); }
+function setTool(t){ S.tool = t; S.hover = null; S.near = null; $('tool-' + t).checked = true; cv.style.cursor = ''; syncEdits(); draw(); }
+function syncEdits(){
+  const n = S.edits.length; $('ed-count').textContent = n ? '고친 획 ' + n + '개' : '고친 곳 없음';
+  $('btn-ed-undo').disabled = $('btn-ed-clear').disabled = !n; $('f-brush').hidden = S.tool === 'move';
+  $('bs-label').textContent = S.tool === 'push' ? '범위' : '굵기';
+  $('tool-hint').textContent = S.tool === 'push' ? '칼선 위에 동그란 표시가 뜨는 곳을 잡고 끄세요. 잡은 곳 주변이 같이 따라오고, 범위가 클수록 넓게 움직입니다. 선이 아닌 곳을 끌면 화면이 움직입니다.' : '캔버스에 칠하세요. 브러시로 칠한 곳은 칼선 안쪽이 되고, 지우개로 지운 곳은 바깥이 됩니다. 화면을 옮기려면 이동으로 바꾸세요. 휠 확대는 그대로 됩니다.';
 }
 function whichHandle(e){
   if (SH.on) return sheetHit(e);
@@ -909,13 +1048,16 @@ function flush(){ if (!pending) return; cancelAnimationFrame(pending); pending =
 /* ---------- 이미지 목록 ---------- */
 function sync(){
   const g = S.rings[S.sel] || S.rings[0]; S.hd = g.d; S.hl = g.l;   // 지름·길이 슬라이더는 선택한 구멍의 값을 보여 준다
-  for (const k of ['margin','smooth','relax','thr','ang','bleed','rr','hd','hl','hw','bw','bh','bx','bd','ws','tw']){ $(k).value = S[k]; $(k + '-n').value = S[k]; setP($(k)); }
-  syncBg(); syncAcr(); $('holes').checked = S.holes; $('dpi').value = S.dpi; $('own').checked = !!(items[cur] && items[cur].own);
+  for (const k of ['margin','smooth','relax','thr','ang','bleed','rr','hd','hl','hw','bw','bh','bx','bd','ws','tw','bs']){ $(k).value = S[k]; $(k + '-n').value = S[k]; setP($(k)); }
+  syncBg(); syncAcr(); syncEdits(); $('holes').checked = S.holes; $('dpi').value = S.dpi; $('own').checked = !!(items[cur] && items[cur].own);
 }
 const setP = r => r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%');
+const setHex = k => { const e = $(k + '-hex'); if (document.activeElement !== e){ e.value = S[k].toUpperCase(); e.classList.remove('bad'); } };
+// 색상 코드 읽기: #RRGGBB, RRGGBB, #RGB, RGB
+function parseHex(t){ const m = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i.exec(t.trim()); if (!m) return null; const h = m[1].toLowerCase(); return '#' + (h.length === 3 ? [...h].map(c => c + c).join('') : h); }
 function syncBg(){
   $('bg-' + S.bg).checked = true; $('c1').value = S.c1; $('c2').value = S.c2;
-  $('c1-hex').textContent = S.c1.toUpperCase(); $('c2-hex').textContent = S.c2.toUpperCase();
+  setHex('c1'); setHex('c2');
   const on = S.bg !== 'none', grad = S.bg === 'linear' || S.bg === 'radial';
   $('bg-none-note').hidden = on; $('f-colors').hidden = !on; $('f-bleed').hidden = !on;
   $('f-c2').hidden = !grad; $('btn-swap').hidden = !grad; $('f-ang').hidden = S.bg !== 'linear'; $('f-rad').hidden = S.bg !== 'radial';
@@ -930,7 +1072,7 @@ function setProd(p){
   showProd();
   load(items[cur]); sync(); compute(); store(items[cur]); stats(); fit(); refreshTags(); scheduleBg();
 }
-function syncAcr(){ for (const k of ['hole', 'base', 'white', 'thin']){ $(k).checked = S[k]; $('f-' + k).hidden = !S[k]; } $('bflip').checked = S.bflip; $('wc').value = S.wc; $('wc-hex').textContent = S.wc.toUpperCase(); $('wprev').checked = S.wprev; }
+function syncAcr(){ for (const k of ['hole', 'base', 'white', 'thin']){ $(k).checked = S[k]; $('f-' + k).hidden = !S[k]; } $('bflip').checked = S.bflip; $('wc').value = S.wc; setHex('wc'); $('wprev').checked = S.wprev; }
 function bgChanged(shape){
   const it = items[cur]; if (!it) return; const o = it.own || G; for (const k of BK) o[k] = S[k]; syncBg();
   if (!shape) return draw();
@@ -996,7 +1138,7 @@ async function readDpi(file){
 }
 function makeItem(img, name, file, url, dpi){
   return { img, w:img.naturalWidth || img.width, h:img.naturalHeight || img.height, name, file, url, dataUrl:null, isSample:false,
-    alpha:null, alphaKey:'', loops:[], path:null, bleedLoops:null, bleedPath:null, box:null, holeHit:false, whitePath:null, thinMap:null, thinN:0, baseSpan:null, back:null, mis:0, misAlt:0, opaque:false, dpi:dpi || 300, dpiSrc:dpi > 0 ? 'file' : 'common',
+    alpha:null, alphaKey:'', loops:[], path:null, bleedLoops:null, bleedPath:null, box:null, holeHit:false, whitePath:null, thinMap:null, thinN:0, baseSpan:null, back:null, mis:0, misAlt:0, edits:[], opaque:false, dpi:dpi || 300, dpiSrc:dpi > 0 ? 'file' : 'common',
     own:null, dirty:true, warn:false, nodes:0, pieces:0, id:Date.now().toString(36) + Math.random().toString(36).slice(2, 8) };
 }
 const backOf = it => ({ img:it.img, file:it.file, url:it.url, w:it.w, h:it.h, name:it.name, dataUrl:null });
@@ -1313,7 +1455,7 @@ function sheetIssues(list){
   });
 }
 function enterSheet(){
-  flush();
+  flush(); if (S.tool !== 'move') setTool('move');
   for (const it of items) if (it.dirty || !it.bb){ load(it); compute(); store(it); }
   load(items[cur]);
   // 처음 들어오면 전체를 늘어놓고, 그 뒤에는 옮겨 둔 자리를 지키면서 새 그림만 빈자리에 놓는다
@@ -1542,7 +1684,7 @@ function saveNote(ok){ const e = $('save-note'); e.textContent = ok ? '자동 �
 function persist(){ if (!db || restoring) return; clearTimeout(saveT); saveT = setTimeout(saveState, 700); }
 async function saveState(){
   if (busy || pending) return persist();
-  const st = { v:1, G, prod:PROD, cur, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, back:it.back ? it.back.name : null })) };
+  const st = { v:1, G, prod:PROD, cur, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, edits:it.edits, back:it.back ? it.back.name : null })) };
   try { await idb('kv', 'readwrite', o => o.put(st, 'state')); saveNote(true); } catch (e){ saveNote(false); }
 }
 async function putImg(key, blob){ if (!db) return; try { await idb('img', 'readwrite', o => o.put(blob, key)); } catch (e){ saveNote(false); } }
@@ -1558,7 +1700,7 @@ async function restore(){
     const blob = await get('img', m.id); if (!blob) continue;
     const url = URL.createObjectURL(blob), img = await loadImg(url); if (!img){ URL.revokeObjectURL(url); continue; }
     const it = makeItem(img, m.name, blob, url, 0);
-    Object.assign(it, { id:m.id, dpi:m.dpi, dpiSrc:m.dpiSrc, own:m.own ? { ...JSON.parse(JSON.stringify(G0)), ...m.own } : null, sn:m.sn, sw:m.sw, pos:m.pos });
+    Object.assign(it, { id:m.id, dpi:m.dpi, dpiSrc:m.dpiSrc, own:m.own ? { ...JSON.parse(JSON.stringify(G0)), ...m.own } : null, sn:m.sn, sw:m.sw, pos:m.pos, edits:Array.isArray(m.edits) ? m.edits : [] });
     if (m.back){
       const bb = await get('img', m.id + ':b'), bu = bb && URL.createObjectURL(bb), bi = bu && await loadImg(bu);
       if (bi) it.back = { img:bi, file:bb, url:bu, w:bi.naturalWidth, h:bi.naturalHeight, name:m.back, dataUrl:null };
@@ -1589,7 +1731,17 @@ function bind(key, rangeId, numId, cb = settingChanged){
   r.addEventListener('input', () => set(r.value, r)); n.addEventListener('input', () => set(n.value, n));
   n.addEventListener('change', () => { n.value = S[key]; });
 }
-bind('margin', 'margin', 'margin-n'); bind('smooth', 'smooth', 'smooth-n'); bind('relax', 'relax', 'relax-n'); const ringEdit = () => { const g = S.rings[S.sel] || S.rings[0]; g.d = S.hd; g.l = S.hl; settingChanged(); };
+bind('margin', 'margin', 'margin-n'); bind('smooth', 'smooth', 'smooth-n'); bind('relax', 'relax', 'relax-n'); bind('bs', 'bs', 'bs-n', draw);
+for (const t of ['move', 'brush', 'erase', 'push']) $('tool-' + t).addEventListener('change', () => setTool(t));
+$('btn-ed-undo').addEventListener('click', undoEdit); $('btn-ed-clear').addEventListener('click', clearEdits);
+addEventListener('keydown', e => {
+  if (SH.on || busy || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z'){ e.preventDefault(); undoEdit(); }
+  else if (e.ctrlKey || e.metaKey || e.altKey) return;
+  else if (k === 'b') setTool('brush'); else if (k === 'e') setTool('erase'); else if (k === 'v') setTool('move'); else if (k === 'w') setTool('push');
+  else if (k === '[' || k === ']'){ S.bs = Math.min(15, Math.max(.5, S.bs + (k === ']' ? .5 : -.5))); $('bs').value = $('bs-n').value = S.bs; setP($('bs')); draw(); }
+}); const ringEdit = () => { const g = S.rings[S.sel] || S.rings[0]; g.d = S.hd; g.l = S.hl; settingChanged(); };
 bind('hd', 'hd', 'hd-n', ringEdit); bind('hl', 'hl', 'hl-n', ringEdit); bind('hw', 'hw', 'hw-n'); bind('tw', 'tw', 'tw-n'); bind('bw', 'bw', 'bw-n'); bind('bh', 'bh', 'bh-n'); bind('bx', 'bx', 'bx-n'); bind('bd', 'bd', 'bd-n'); bind('ws', 'ws', 'ws-n', () => bgChanged(true));
 $('white').addEventListener('change', e => { S.white = e.target.checked; syncAcr(); bgChanged(true); });
 $('wc').addEventListener('input', e => { S.wc = e.target.value; syncAcr(); bgChanged(); });
@@ -1597,6 +1749,13 @@ $('wprev').addEventListener('change', e => { S.wprev = e.target.checked; update(
 $('btn-center').addEventListener('click', () => { S.rx = S.ry = .5; S.rr = 100; bgChanged(); sync(); });
 for (const r of document.querySelectorAll('input[name=bgtype]')) r.addEventListener('change', () => { S.bg = r.value; bgChanged(true); });
 for (const k of ['c1', 'c2']) $(k).addEventListener('input', e => { S[k] = e.target.value; bgChanged(); });
+for (const k of ['c1', 'c2', 'wc']){
+  const e = $(k + '-hex');
+  e.addEventListener('input', () => { const v = parseHex(e.value); e.classList.toggle('bad', !v); if (v && v !== S[k]){ S[k] = v; $(k).value = v; bgChanged(); } });
+  e.addEventListener('blur', () => setHex(k));
+  e.addEventListener('keydown', ev => { if (ev.key === 'Enter') e.blur(); });
+  e.addEventListener('focus', () => e.select());
+}
 $('btn-swap').addEventListener('click', () => { [S.c1, S.c2] = [S.c2, S.c1]; bgChanged(); });
 const check = (id, key, fn) => { $(id).checked = S[key]; $(id).addEventListener('change', e => { S[key] = e.target.checked; fn(); }); };
 check('holes', 'holes', settingChanged);
@@ -1648,9 +1807,17 @@ $('btn-pdf').addEventListener('click', () => doExport('pdf')); $('btn-svg').addE
 
 cv.addEventListener('wheel', e => { e.preventDefault(); const r = cv.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY * .0015), e.clientX - r.left, e.clientY - r.top); }, { passive:false });
 const ptrs = new Map(); let pinch = 0, grab = null;
-cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); grab = ptrs.size ? null : whichHandle(e); if (grab && grab.t === 'hole'){ S.sel = grab.i; sync(); draw(); } if (SH.on){ SH.sel = grab ? grab.i : -1; syncSheet(); draw(); } ptrs.set(e.pointerId, [e.clientX, e.clientY]); cv.classList.add('drag'); pinch = 0; });
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); grab = ptrs.size ? null : paintStart(e) || warpStart(e) || whichHandle(e); if (grab && grab.t === 'hole'){ S.sel = grab.i; sync(); draw(); } if (SH.on){ SH.sel = grab ? grab.i : -1; syncSheet(); draw(); } ptrs.set(e.pointerId, [e.clientX, e.clientY]); cv.classList.add('drag'); pinch = 0; });
 cv.addEventListener('pointermove', e => {
-  const p = ptrs.get(e.pointerId); if (!p){ cv.style.cursor = whichHandle(e) ? 'move' : ''; return; }
+  const p = ptrs.get(e.pointerId);
+  if (!p){
+    if (painting()){ S.hover = toArt(e); cv.style.cursor = 'crosshair'; draw(); }
+    else if (!SH.on && S.tool === 'push'){ S.hover = toArt(e); const n = S.loops.length ? nearestOutline(S.hover) : null; S.near = n ? denseLoops()[n.li][n.i] : null; cv.style.cursor = n ? 'pointer' : ''; draw(); }
+    else cv.style.cursor = whichHandle(e) ? 'move' : '';
+    return;
+  }
+  if (grab && grab.t === 'paint'){ if (ptrs.size === 1) paintMove(e); return; }
+  if (grab && grab.t === 'warp'){ if (ptrs.size === 1) warpMove(e); return; }
   if (grab && ptrs.size === 1) return grab.t === 'hole' ? moveHole(e, grab.i) : grab.t === 'piece' ? movePiece(e, grab) : moveHandle(e);
   if (ptrs.size === 1){ const v = SH.on ? SH.view : S.view; v.ox += e.clientX - p[0]; v.oy += e.clientY - p[1]; ptrs.set(e.pointerId, [e.clientX, e.clientY]); (SH.on ? SH : S).moved = true; draw(); return; }
   ptrs.set(e.pointerId, [e.clientX, e.clientY]);
@@ -1658,7 +1825,8 @@ cv.addEventListener('pointermove', e => {
   if (pinch) zoomAt(d / pinch, (a[0]+b[0]) / 2 - r.left, (a[1]+b[1]) / 2 - r.top);
   pinch = d;
 });
-const up = e => { ptrs.delete(e.pointerId); pinch = 0; grab = null; if (!ptrs.size) cv.classList.remove('drag'); };
+const up = e => { if (grab && grab.t === 'paint') paintEnd(); if (grab && grab.t === 'warp') warpEnd(); ptrs.delete(e.pointerId); pinch = 0; grab = null; if (!ptrs.size) cv.classList.remove('drag'); };
+cv.addEventListener('pointerleave', () => { if (S.hover && !S.stroke && !S.warp){ S.hover = null; S.near = null; draw(); } });
 cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
 
 addEventListener('keydown', e => { if (e.code === 'Space' && !/INPUT|BUTTON/.test(e.target.tagName)){ e.preventDefault(); if (!S.spaceHide){ S.spaceHide = true; draw(); } } });

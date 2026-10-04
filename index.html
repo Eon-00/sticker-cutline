@@ -44,7 +44,7 @@ button{cursor:pointer}
 svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none;display:block}
 
 /* 상단바 */
-.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:9px;min-width:0}
 .brand svg{width:22px;height:22px;flex:none}
 .brand b{font-weight:600;font-size:14.5px;letter-spacing:-.015em;white-space:nowrap}
@@ -54,14 +54,12 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
 .group{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);white-space:nowrap;font-weight:500;transition:background .12s,border-color .12s}
 .btn:hover{background:var(--field)}
-.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.ghost{border-color:transparent;color:var(--muted);padding:0 8px}
 .btn.ghost:hover{color:var(--fg)}
 .btn.primary{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
 .btn.primary:hover{opacity:.88;background:var(--btn)}
 .btns{display:flex;flex-wrap:wrap;gap:6px}
 .btn.mini{height:26px;padding:0 9px;font-size:12px;border-radius:6px;flex:none}
-.seg.mode{min-width:150px}
-.seg.prod{min-width:190px}
 .side[data-prod="sticker"] [data-for]:not([data-for~="sticker"]),.side[data-prod="keyring"] [data-for]:not([data-for~="keyring"]),.side[data-prod="korotto"] [data-for]:not([data-for~="korotto"]){display:none}
 .shlist{display:flex;flex-direction:column;gap:6px}
 .shrow{display:flex;align-items:center;gap:6px;padding:5px;border:1px solid var(--line);border-radius:8px;min-width:0}
@@ -81,7 +79,9 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
 .side.sheet > .sec:not(#sec-sheet){display:none}
 .ok{margin:0;padding:8px 10px;border-radius:8px;font-size:12px;background:var(--field);color:var(--fg)}
 .num input:disabled{opacity:.4}
-.scope{display:flex;align-items:center;gap:8px;white-space:nowrap;color:var(--muted);cursor:pointer;padding-right:4px}
+.name{width:100%;height:30px;padding:0 9px;border:1px solid transparent;border-radius:7px;background:var(--field);outline:0;font-size:13px;color:var(--fg)}
+.name:focus{border-color:var(--fg);background:var(--panel)}
+.name:disabled{opacity:.5}
 
 /* 스위치 */
 .sw{appearance:none;-webkit-appearance:none;flex:none;width:30px;height:18px;margin:0;border-radius:9px;background:var(--line-strong);position:relative;cursor:pointer;transition:background .15s}
@@ -147,7 +147,7 @@ input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;bac
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:2px;border-radius:8px;background:var(--field)}
 .seg label{position:relative;cursor:pointer}
 .seg input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.seg span{display:block;text-align:center;padding:5px 0;border-radius:6px;font-size:12.5px;color:var(--muted)}
+.seg label>span{display:block;text-align:center;padding:5px 8px;border-radius:6px;font-size:12.5px;color:var(--muted);white-space:nowrap}
 .seg input:checked+span{background:var(--panel);color:var(--fg);font-weight:500;box-shadow:0 0 0 1px var(--line),0 1px 2px rgba(0,0,0,.06)}
 .seg input:focus-visible+span{outline:2px solid var(--cut);outline-offset:1px}
 .colors{display:flex;align-items:center;gap:8px}
@@ -208,7 +208,10 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
     </div>
     <div class="spacer"></div>
     <div class="group">
-      <label class="scope" id="all-wrap" hidden><span>전체 <span id="all-n">2</span>개 저장</span><input class="sw" id="all" type="checkbox"></label>
+      <div class="seg scope" id="all-wrap" role="radiogroup" aria-label="저장 대상" hidden>
+        <label><input type="radio" name="scope" id="scope-one" checked><span>이 이미지만</span></label>
+        <label><input type="radio" name="scope" id="all"><span>전체 <span id="all-n">2</span>개</span></label>
+      </div>
       <button class="btn primary" id="btn-ai" type="button"><svg class="ic" viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.5 8 10.7l3.2-3.2M3 13.5h10"/></svg>AI 저장</button>
       <button class="btn" id="btn-pdf" type="button">PDF</button>
       <button class="btn" id="btn-svg" type="button">SVG</button>
@@ -244,12 +247,25 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
         <p class="hint">규격: <b>스프몰 조각스티커 330 × 480 mm</b>. 점선 안쪽(270 × 405 mm)이 작업 영역입니다. 조각을 끌어서 옮기세요.</p>
         <p class="warn" id="sh-warn" hidden></p>
         <p class="ok" id="sh-ok" hidden>규격에 맞습니다.</p>
+        <div class="field">
+          <div class="row"><label for="sh-file">파일 이름</label><span class="hint">.ai</span></div>
+          <input class="name" id="sh-file" type="text" maxlength="80" spellcheck="false" autocomplete="off" placeholder="예: 1_낱장_유포지_무광코팅_20장">
+          <p class="hint">스프몰은 파일 이름에 작업 내용을 적어 달라고 합니다. 예: 1_낱장_유포지_무광코팅_20장</p>
+        </div>
         <div class="shlist" id="sh-list"></div>
         <p class="hint">가로 크기(mm)와 장수를 그림마다 정합니다. 장수를 늘리면 새 조각만 빈자리에 놓고, 크기를 바꾸면 그 그림의 조각만 다시 놓습니다. 다른 조각의 자리는 그대로입니다.</p>
         <p class="hint" id="sh-sel"></p>
         <div class="btns"><button class="btn mini" id="btn-fill" type="button">남은 자리 채우기</button><button class="btn mini" id="btn-dup" type="button">한 장 더</button><button class="btn mini" id="btn-del" type="button">이 조각 빼기</button><button class="btn mini" id="btn-arrange" type="button">전체 다시 배치</button></div>
         <p class="hint"><kbd>Ctrl</kbd>+<kbd>D</kbd>로 고른 조각을 한 장 더, <kbd>Delete</kbd>로 그 조각만 뺍니다. 칼선과 배경은 <b>낱장</b> 화면에서 바꾸고, 저장은 <b>AI 저장</b>으로 합니다. 레이어는 인쇄 / 완칼선 / 돔보로 나뉘어 들어갑니다.</p>
       </section>
+      <section class="sec">
+        <div class="field">
+          <div class="row"><label for="fname">파일 이름</label><span class="hint" id="fname-ext"></span></div>
+          <input class="name" id="fname" type="text" maxlength="80" spellcheck="false" autocomplete="off">
+          <p class="hint">저장할 때 이 이름으로 나옵니다. 확장자는 자동으로 붙습니다.</p>
+        </div>
+      </section>
+
       <section class="sec">
         <h2>칼선</h2>
         <label class="opt"><span>이 이미지만 따로 설정<small>끄면 모든 이미지에 같은 값을 씁니다</small></span><input class="sw" id="own" type="checkbox"></label>
@@ -1037,6 +1053,8 @@ function stats(){
     else if (t === 1) w.push('무게중심이 바닥(' + bwmm + ' mm) 끝에 치우쳐 있어 넘어지기 쉽습니다.');
   }
   $('warn').hidden = !w.length; $('warn').textContent = w.join(' ');
+  if (document.activeElement !== $('fname')){ $('fname').value = S.isSample ? '' : S.name; $('fname').disabled = S.isSample; $('fname').placeholder = S.isSample ? '예시 이미지는 저장되지 않습니다' : ''; }
+  $('fname-ext').textContent = S.isSample ? '' : '_cutline.ai';
   $('chip-file').innerHTML = '';
   if (S.isSample){ const b = document.createElement('span'); b.className = 'sample'; b.textContent = '예시 이미지'; $('chip-file').append(b, ' · 저장되지 않습니다. 이미지를 열거나 끌어다 놓으세요'); }
   else $('chip-file').textContent = S.name + (S.back ? ' (양면)' : '') + ' · ' + S.w + ' × ' + S.h + ' px' + (items.length > 1 ? ' · ' + (cur + 1) + ' / ' + items.length : '');
@@ -1388,7 +1406,7 @@ async function buildAi(){
    업체 템플릿 규격의 한 판에 여러 조각을 늘어놓는다. 길이 단위는 mm, 원점은 용지 왼쪽 위.
    돔보(재단기 기준 표시)와 레이어 이름은 템플릿 파일에서 그대로 옮긴 값이라 바꾸면 안 된다. */
 const PT = 72 / 25.4;
-const SH = { on:false, sel:-1, view:{ scale:1, ox:0, oy:0 }, moved:false, fitted:false,
+const SH = { on:false, file:'sticker_sheet', sel:-1, view:{ scale:1, ox:0, oy:0 }, moved:false, fitted:false,
   name:'스프몰 조각스티커 330×480', page:[330, 480], area:[25, 50, 270, 405], gap:10, min:[40, 40], max:25,
   layers:{ print:'인쇄', cut:'완칼선', reg:'SA regmark type2 auto 33 28.35 2.83 28.35 283.46 283.46 0 -2 0.00 0 0.00 0.00', info:'SA info 0 0 0 17.01 1 -16777216 -16777216 1 1 0' }
 };
@@ -1475,7 +1493,9 @@ function fitSheet(){
   const sc = Math.min((r.width - 40) / SH.page[0], (r.height - 90) / SH.page[1]);
   SH.view = { scale:sc, ox:(r.width - SH.page[0]*sc) / 2, oy:(r.height - 50 - SH.page[1]*sc) / 2 + 10 }; SH.moved = false; draw();
 }
+const cleanName = t => t.replace(/[\\/:*?"<>|\x00-\x1f]/g, '').replace(/\s+/g, ' ').trim().replace(/\.+$/, '');
 function syncSheet(){
+  if (document.activeElement !== $('sh-file')) $('sh-file').value = SH.file;
   const list = pieces(), iss = sheetIssues(list), sel = list[SH.sel], w = [], cnt = k => iss.filter(r => r[k]).length;
   $('sh-count').textContent = '합계 ' + list.length + ' / ' + SH.max;
   if (list.length > SH.max) w.push('조각이 ' + list.length + '개입니다. 한 판에 ' + SH.max + '개까지만 넣을 수 있습니다.');
@@ -1592,7 +1612,7 @@ async function saveSheet(kind){
   busy = true; $('app').inert = true;
   let blob; try { blob = kind === 'ai' ? buildSheetAi() : await buildSheetPdf(); } finally { load(items[cur]); busy = false; $('app').inert = false; }
   const bad = !$('sh-warn').hidden;
-  if (await save('sticker_sheet.' + kind, blob) && bad) toast('저장했습니다. 규격에 맞지 않는 조각이 있으니 확인해 주세요.');
+  if (await save(SH.file + '.' + kind, blob) && bad) toast('저장했습니다. 규격에 맞지 않는 조각이 있으니 확인해 주세요.');
 }
 async function buildPngs(){
   const P = exportPad(), W = S.w + 2*P, H = S.h + 2*P;
@@ -1684,7 +1704,7 @@ function saveNote(ok){ const e = $('save-note'); e.textContent = ok ? '자동 �
 function persist(){ if (!db || restoring) return; clearTimeout(saveT); saveT = setTimeout(saveState, 700); }
 async function saveState(){
   if (busy || pending) return persist();
-  const st = { v:1, G, prod:PROD, cur, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, edits:it.edits, back:it.back ? it.back.name : null })) };
+  const st = { v:1, G, prod:PROD, cur, sheetFile:SH.file, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, edits:it.edits, back:it.back ? it.back.name : null })) };
   try { await idb('kv', 'readwrite', o => o.put(st, 'state')); saveNote(true); } catch (e){ saveNote(false); }
 }
 async function putImg(key, blob){ if (!db) return; try { await idb('img', 'readwrite', o => o.put(blob, key)); } catch (e){ saveNote(false); } }
@@ -1708,6 +1728,7 @@ async function restore(){
     made.push(it);
   }
   if (!made.length) return false;
+  if (st.sheetFile) SH.file = st.sheetFile;
   Object.assign(G, st.G); PROD = ['sticker', 'keyring', 'korotto'].includes(st.prod) ? st.prod : 'sticker';
   items.length = 0; items.push(...made); showProd(); activate(Math.min(st.cur || 0, items.length - 1)); return true;
 }
@@ -1719,7 +1740,7 @@ async function clearAll(){
   clearTimeout(clearT); clearT = 0; b.textContent = '모두 비우기'; if (busy) return; flush();
   for (const it of items){ if (it.file) URL.revokeObjectURL(it.url); if (it.back) URL.revokeObjectURL(it.back.url); }
   if (db) try { await idb('img', 'readwrite', o => o.clear()); await idb('kv', 'readwrite', o => o.clear()); } catch (e){}
-  if (SH.on) leaveSheet(); SH.sel = -1; SH.fitted = false; items.length = 0;
+  if (SH.on) leaveSheet(); SH.sel = -1; SH.fitted = false; SH.file = 'sticker_sheet'; items.length = 0;
   Object.assign(G, JSON.parse(JSON.stringify(G0))); PROD = 'sticker'; showProd();   // 설정도 처음 값으로
   sample(); toast('모두 비웠습니다.');
 }
@@ -1796,6 +1817,14 @@ $('btn-cut').addEventListener('click', e => { S.showCut = !S.showCut; e.currentT
 for (const k of ['one', 'sheet']) $('mode-' + k).addEventListener('change', () => { if (busy) return; k === 'sheet' ? enterSheet() : leaveSheet(); });
 $('btn-arrange').addEventListener('click', () => { arrange(); sheetChanged(); });
 for (const k of ['sticker', 'keyring', 'korotto']) $('prod-' + k).addEventListener('change', () => setProd(k));
+$('fname').addEventListener('change', e => {
+  const it = items[cur], t = cleanName(e.target.value); e.target.blur();
+  if (!it || it.isSample || !t || t === it.name){ stats(); return; }
+  let name = t; for (let n = 2; items.some(x => x !== it && x.name === name); n++) name = t + '-' + n;   // 같은 이름이 있으면 번호를 붙인다
+  flush(); it.name = S.name = name; stats(); renderRail(); if (name !== t) toast('같은 이름이 있어 ' + name + '(으)로 바꿨습니다.');
+});
+$('sh-file').addEventListener('change', e => { const t = cleanName(e.target.value); if (t) SH.file = t; e.target.blur(); e.target.value = SH.file; persist(); });
+for (const k of ['fname', 'sh-file']) $(k).addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
 $('btn-fill').addEventListener('click', fillSel); $('btn-dup').addEventListener('click', dupSel); $('btn-del').addEventListener('click', delSel);
 addEventListener('keydown', e => {
   if (!SH.on || busy || /INPUT|TEXTAREA/.test(e.target.tagName)) return;

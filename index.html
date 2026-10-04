@@ -49,6 +49,8 @@ svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;str
 .brand svg{width:22px;height:22px;flex:none}
 .brand b{font-weight:600;font-size:14.5px;letter-spacing:-.015em;white-space:nowrap}
 .spacer{flex:1 1 0;min-width:0}
+.savenote{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.savenote.bad{color:var(--warn)}
 .group{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);white-space:nowrap;font-weight:500;transition:background .12s,border-color .12s}
 .btn:hover{background:var(--field)}
@@ -190,6 +192,8 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
     </div>
     <button class="btn ghost" id="btn-open" type="button"><svg class="ic" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>이미지 열기</button>
     <input id="file-input" type="file" accept="image/png,image/webp,image/gif" multiple hidden>
+    <button class="btn ghost" id="btn-clear" type="button">모두 비우기</button>
+    <span class="savenote" id="save-note"></span>
     <div class="seg prod" role="radiogroup" aria-label="제품">
       <label><input type="radio" name="prod" id="prod-sticker" checked><span>스티커</span></label>
       <label><input type="radio" name="prod" id="prod-keyring"><span>키링</span></label>
@@ -749,6 +753,7 @@ function zoomAt(f, cx, cy){
   v.ox = cx - (cx - v.ox)*k; v.oy = cy - (cy - v.oy)*k; v.scale = ns; (SH.on ? SH : S).moved = true; draw();
 }
 function draw(){
+  persist();
   if (SH.on) return drawSheet();
   const dpr = window.devicePixelRatio || 1, v = S.view, cw = cv.width / dpr, ch = cv.height / dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -922,8 +927,7 @@ function setProd(p){
   if (SH.on && p !== 'sticker') leaveSheet();
   for (const o of [G, ...items.map(it => it.own).filter(Boolean)]){ o.hole = p === 'keyring'; o.base = p === 'korotto'; if (p === 'sticker'){ o.white = false; o.thin = false; } }
   for (const it of items) it.dirty = true;
-  document.querySelector('.side').dataset.prod = p; $('mode-wrap').hidden = p !== 'sticker';
-  $('acr-title').textContent = p === 'keyring' ? '아크릴 키링' : '코롯토';
+  showProd();
   load(items[cur]); sync(); compute(); store(items[cur]); stats(); fit(); refreshTags(); scheduleBg();
 }
 function syncAcr(){ for (const k of ['hole', 'base', 'white', 'thin']){ $(k).checked = S[k]; $('f-' + k).hidden = !S[k]; } $('bflip').checked = S.bflip; $('wc').value = S.wc; $('wc-hex').textContent = S.wc.toUpperCase(); $('wprev').checked = S.wprev; }
@@ -958,6 +962,7 @@ function refreshTags(){ for (const it of items){ if (!it.tw) continue; it.tw.hid
 function removeItem(i){
   if (busy) return; flush();
   const [it] = items.splice(i, 1); if (it.file) URL.revokeObjectURL(it.url); if (it.back) URL.revokeObjectURL(it.back.url);
+  delImg(it.id); delImg(it.id + ':b');
   if (!items.length) return sample();
   activate(Math.min(i < cur ? cur - 1 : cur, items.length - 1));
 }
@@ -992,7 +997,7 @@ async function readDpi(file){
 function makeItem(img, name, file, url, dpi){
   return { img, w:img.naturalWidth || img.width, h:img.naturalHeight || img.height, name, file, url, dataUrl:null, isSample:false,
     alpha:null, alphaKey:'', loops:[], path:null, bleedLoops:null, bleedPath:null, box:null, holeHit:false, whitePath:null, thinMap:null, thinN:0, baseSpan:null, back:null, mis:0, misAlt:0, opaque:false, dpi:dpi || 300, dpiSrc:dpi > 0 ? 'file' : 'common',
-    own:null, dirty:true, warn:false, nodes:0, pieces:0 };
+    own:null, dirty:true, warn:false, nodes:0, pieces:0, id:Date.now().toString(36) + Math.random().toString(36).slice(2, 8) };
 }
 const backOf = it => ({ img:it.img, file:it.file, url:it.url, w:it.w, h:it.h, name:it.name, dataUrl:null });
 const loadImg = url => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = url; });
@@ -1002,9 +1007,9 @@ async function setBack(file){
   const url = URL.createObjectURL(file), img = await loadImg(url);
   if (!img){ URL.revokeObjectURL(url); return toast('이미지를 읽지 못했습니다. 파일이 손상되지 않았는지 확인해 주세요.'); }
   flush(); if (it.back) URL.revokeObjectURL(it.back.url);
-  it.back = { img, file, url, w:img.naturalWidth, h:img.naturalHeight, name:file.name.replace(/\.[^.]+$/, ''), dataUrl:null }; it.dirty = true; activate(cur);
+  it.back = { img, file, url, w:img.naturalWidth, h:img.naturalHeight, name:file.name.replace(/\.[^.]+$/, ''), dataUrl:null }; it.dirty = true; putImg(it.id + ':b', file); activate(cur);
 }
-function clearBack(){ const it = items[cur]; if (!it || !it.back || busy) return; flush(); URL.revokeObjectURL(it.back.url); it.back = null; it.dirty = true; activate(cur); }
+function clearBack(){ const it = items[cur]; if (!it || !it.back || busy) return; flush(); URL.revokeObjectURL(it.back.url); it.back = null; it.dirty = true; delImg(it.id + ':b'); activate(cur); }
 async function addFiles(list){
   const files = [...list]; if (!files.length || busy) return;
   const ok = files.filter(f => /^image\/(png|webp|gif)$/.test(f.type)), made = [];
@@ -1025,11 +1030,11 @@ async function addFiles(list){
   for (const it of [...made]){
     const m = it.name.match(/^(.+?)[ _-]*(?:back|뒷면|뒤)$/i), f = m && fronts.find(x => x !== it && x.name === m[1] && !x.back);
     if (!f) continue;
-    f.back = backOf(it); f.dirty = true; made.splice(made.indexOf(it), 1); paired++;
+    f.back = backOf(it); f.dirty = true; made.splice(made.indexOf(it), 1); paired++; putImg(f.id + ':b', it.file);
   }
   if (!made.length){ activate(cur); return toast('뒷면 ' + paired + '개를 앞면에 짝지었습니다.'); }
   if (items.length === 1 && items[0].isSample) items.length = 0;
-  const first = items.length; items.push(...made);
+  const first = items.length; items.push(...made); for (const it of made) putImg(it.id, it.file);
   if (first < 2 && items.length >= 2) $('all').checked = true;
   activate(first);
   const skipped = files.length - made.length - paired;
@@ -1520,6 +1525,63 @@ async function doExport(kind){
 let toastT = 0;
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3800); }
 
+/* ---------- 자동 저장 ----------
+   작업 중인 이미지와 설정을 이 브라우저(IndexedDB)에 남겨, 탭을 닫거나 새로고침해도 이어서 할 수 있게 한다.
+   이미지는 올릴 때 한 번, 설정과 배치는 바뀔 때마다 저장한다. 저장소를 못 쓰는 환경에서는 조용히 건너뛴다. */
+let db = null, saveT = 0, restoring = true;
+const G0 = JSON.parse(JSON.stringify(G));   // 처음 기본값. 예전에 저장한 설정에 없는 항목을 채우는 데 쓴다
+const idb = (store, mode, fn) => new Promise((res, rej) => { const tx = db.transaction(store, mode), rq = fn(tx.objectStore(store)); tx.oncomplete = () => res(rq && rq.result); tx.onerror = tx.onabort = () => rej(tx.error); });
+function openDb(){
+  return new Promise(res => { try {
+    const rq = indexedDB.open('cutline-maker', 1);
+    rq.onupgradeneeded = () => { rq.result.createObjectStore('kv'); rq.result.createObjectStore('img'); };
+    rq.onsuccess = () => res(rq.result); rq.onerror = rq.onblocked = () => res(null);
+  } catch (e){ res(null); } });
+}
+function saveNote(ok){ const e = $('save-note'); e.textContent = ok ? '자동 저장됨' : '자동 저장 안 됨'; e.title = ok ? '이미지와 설정이 이 브라우저에 저장되어 있습니다. 다시 열면 이어서 할 수 있습니다.' : '이 브라우저에서는 저장소를 쓸 수 없거나 공간이 부족합니다. 창을 닫으면 작업이 사라집니다.'; e.classList.toggle('bad', !ok); }
+function persist(){ if (!db || restoring) return; clearTimeout(saveT); saveT = setTimeout(saveState, 700); }
+async function saveState(){
+  if (busy || pending) return persist();
+  const st = { v:1, G, prod:PROD, cur, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, back:it.back ? it.back.name : null })) };
+  try { await idb('kv', 'readwrite', o => o.put(st, 'state')); saveNote(true); } catch (e){ saveNote(false); }
+}
+async function putImg(key, blob){ if (!db) return; try { await idb('img', 'readwrite', o => o.put(blob, key)); } catch (e){ saveNote(false); } }
+async function delImg(key){ if (!db) return; try { await idb('img', 'readwrite', o => o.delete(key)); } catch (e){} }
+function showProd(){ $('prod-' + PROD).checked = true; document.querySelector('.side').dataset.prod = PROD; $('mode-wrap').hidden = PROD !== 'sticker'; $('acr-title').textContent = PROD === 'keyring' ? '아크릴 키링' : '코롯토'; }
+async function restore(){
+  db = await openDb(); if (!db){ saveNote(false); return false; }
+  saveNote(true);
+  const get = (store, key) => idb(store, 'readonly', o => o.get(key)).catch(() => null), st = await get('kv', 'state');
+  if (!st || !st.items || !st.items.length) return false;
+  const made = [];
+  for (const m of st.items){
+    const blob = await get('img', m.id); if (!blob) continue;
+    const url = URL.createObjectURL(blob), img = await loadImg(url); if (!img){ URL.revokeObjectURL(url); continue; }
+    const it = makeItem(img, m.name, blob, url, 0);
+    Object.assign(it, { id:m.id, dpi:m.dpi, dpiSrc:m.dpiSrc, own:m.own ? { ...JSON.parse(JSON.stringify(G0)), ...m.own } : null, sn:m.sn, sw:m.sw, pos:m.pos });
+    if (m.back){
+      const bb = await get('img', m.id + ':b'), bu = bb && URL.createObjectURL(bb), bi = bu && await loadImg(bu);
+      if (bi) it.back = { img:bi, file:bb, url:bu, w:bi.naturalWidth, h:bi.naturalHeight, name:m.back, dataUrl:null };
+    }
+    made.push(it);
+  }
+  if (!made.length) return false;
+  Object.assign(G, st.G); PROD = ['sticker', 'keyring', 'korotto'].includes(st.prod) ? st.prod : 'sticker';
+  items.length = 0; items.push(...made); showProd(); activate(Math.min(st.cur || 0, items.length - 1)); return true;
+}
+// 전부 비우기: 한 번 누르면 확인을 묻고, 3초 안에 다시 누르면 비운다
+let clearT = 0;
+async function clearAll(){
+  const b = $('btn-clear');
+  if (!clearT){ b.textContent = '한 번 더 누르면 비웁니다'; clearT = setTimeout(() => { clearT = 0; b.textContent = '모두 비우기'; }, 3000); return; }
+  clearTimeout(clearT); clearT = 0; b.textContent = '모두 비우기'; if (busy) return; flush();
+  for (const it of items){ if (it.file) URL.revokeObjectURL(it.url); if (it.back) URL.revokeObjectURL(it.back.url); }
+  if (db) try { await idb('img', 'readwrite', o => o.clear()); await idb('kv', 'readwrite', o => o.clear()); } catch (e){}
+  if (SH.on) leaveSheet(); SH.sel = -1; SH.fitted = false; items.length = 0;
+  Object.assign(G, JSON.parse(JSON.stringify(G0))); PROD = 'sticker'; showProd();   // 설정도 처음 값으로
+  sample(); toast('모두 비웠습니다.');
+}
+
 /* ---------- 입력 ---------- */
 function bind(key, rangeId, numId, cb = settingChanged){
   const r = $(rangeId), n = $(numId); r.value = n.value = S[key];
@@ -1611,7 +1673,8 @@ addEventListener('paste', e => { addFiles(e.clipboardData ? e.clipboardData.file
 new ResizeObserver(resize).observe(stage);
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
 new MutationObserver(draw).observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
-sample();
+$('btn-clear').addEventListener('click', clearAll);
+restore().then(ok => { restoring = false; if (ok) toast('이전 작업을 불러왔습니다.'); else sample(); }).catch(() => { restoring = false; sample(); });
 })();
 </script>
 </body>

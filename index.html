@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="투명 배경 이미지를 올리면 스티커 칼선과 배경색을 만들어 SVG나 PNG로 내보냅니다. 이미지는 브라우저 밖으로 나가지 않습니다.">
+<meta name="description" content="투명 배경 이미지를 올리면 스티커, 키링, 코롯토용 칼선을 만들어 AI 파일로 내보냅니다. 이미지는 브라우저 밖으로 나가지 않습니다.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='9' fill='none' stroke='%23e6007e' stroke-width='1.6' stroke-dasharray='2.6 2.2'/%3E%3Ccircle cx='11' cy='11' r='4.6' fill='%23141a18'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<title>스티커 칼선 메이커</title>
+<title>굿즈 칼선 메이커</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 html,body{margin:0}
@@ -191,7 +191,7 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
   <header class="top">
     <div class="brand">
       <svg viewBox="0 0 22 22" aria-hidden="true"><path d="M11 2.2c4.9 0 8.8 3.4 8.8 8.3 0 5.2-4 9.3-9.2 9.3-4.6 0-8.4-3.3-8.4-8C2.2 6.4 6 2.2 11 2.2z" fill="none" stroke="var(--cut)" stroke-width="1.4" stroke-dasharray="2.6 2.2" stroke-linecap="round"/><circle cx="11" cy="11" r="4.6" fill="var(--fg)"/></svg>
-      <b>스티커 칼선 메이커</b>
+      <b>굿즈 칼선 메이커</b>
     </div>
     <button class="btn ghost" id="btn-open" type="button"><svg class="ic" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>이미지 열기</button>
     <input id="file-input" type="file" accept="image/png,image/webp,image/gif" multiple hidden>
@@ -244,19 +244,29 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
     <aside class="side" data-prod="sticker">
       <section class="sec" id="sec-sheet" hidden>
         <div class="head"><h2>시트 배치</h2><span class="num" id="sh-count">합계 0 / 25</span></div>
-        <p class="hint">규격: <b>스프몰 조각스티커 330 × 480 mm</b>. 점선 안쪽(270 × 405 mm)이 작업 영역입니다. 조각을 끌어서 옮기세요.</p>
+        <div class="field">
+          <label for="sh-preset">업체 규격</label>
+          <select class="name" id="sh-preset"></select>
+          <p class="hint" id="sh-spec"></p>
+        </div>
+        <div class="field">
+          <div class="row"><span class="l">업체 원본 폼파일</span><span class="savenote" id="tpl-state">없음</span></div>
+          <div class="btns"><button class="btn mini" id="btn-tpl" type="button">원본 폼파일 넣기</button></div>
+          <input id="tpl-input" type="file" accept=".ai,application/postscript,application/pdf,application/illustrator" hidden>
+          <p class="hint">업체에서 받은 폼파일(.ai)을 넣어 두면, AI로 저장할 때 <b>그 파일의 빈 레이어에 그림과 칼선만 끼워 넣습니다.</b> 돔보와 레이어가 업체 원본 그대로 남습니다. 한 번 넣으면 이 브라우저에 보관됩니다. 넣지 않으면 돔보를 같은 자리에 새로 그려 저장하는데, 업체에서 받아 주지 않을 수 있습니다.</p>
+        </div>
         <p class="warn" id="sh-warn" hidden></p>
         <p class="ok" id="sh-ok" hidden>규격에 맞습니다.</p>
         <div class="field">
           <div class="row"><label for="sh-file">파일 이름</label><span class="hint">.ai</span></div>
-          <input class="name" id="sh-file" type="text" maxlength="80" spellcheck="false" autocomplete="off" placeholder="예: 1_낱장_유포지_무광코팅_20장">
-          <p class="hint">스프몰은 파일 이름에 작업 내용을 적어 달라고 합니다. 예: 1_낱장_유포지_무광코팅_20장</p>
+          <input class="name" id="sh-file" type="text" maxlength="80" spellcheck="false" autocomplete="off">
+          <p class="hint" id="sh-file-hint"></p>
         </div>
         <div class="shlist" id="sh-list"></div>
         <p class="hint">가로 크기(mm)와 장수를 그림마다 정합니다. 장수를 늘리면 새 조각만 빈자리에 놓고, 크기를 바꾸면 그 그림의 조각만 다시 놓습니다. 다른 조각의 자리는 그대로입니다.</p>
         <p class="hint" id="sh-sel"></p>
         <div class="btns"><button class="btn mini" id="btn-fill" type="button">남은 자리 채우기</button><button class="btn mini" id="btn-dup" type="button">한 장 더</button><button class="btn mini" id="btn-del" type="button">이 조각 빼기</button><button class="btn mini" id="btn-arrange" type="button">전체 다시 배치</button></div>
-        <p class="hint"><kbd>Ctrl</kbd>+<kbd>D</kbd>로 고른 조각을 한 장 더, <kbd>Delete</kbd>로 그 조각만 뺍니다. 칼선과 배경은 <b>낱장</b> 화면에서 바꾸고, 저장은 <b>AI 저장</b>으로 합니다. 레이어는 인쇄 / 완칼선 / 돔보로 나뉘어 들어갑니다.</p>
+        <p class="hint"><kbd>Ctrl</kbd>+<kbd>D</kbd>로 고른 조각을 한 장 더, <kbd>Delete</kbd>로 그 조각만 뺍니다. 칼선과 배경은 <b>낱장</b> 화면에서 바꾸고, 저장은 <b>AI 저장</b>으로 합니다. 레이어 이름과 돔보는 고른 업체 템플릿과 같게 들어갑니다. 조각은 끌어서 옮깁니다.</p>
       </section>
       <section class="sec">
         <div class="field">
@@ -442,6 +452,7 @@ kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line-strong)
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script>
 (() => {
 'use strict';
@@ -1171,7 +1182,8 @@ async function setBack(file){
 }
 function clearBack(){ const it = items[cur]; if (!it || !it.back || busy) return; flush(); URL.revokeObjectURL(it.back.url); it.back = null; it.dirty = true; delImg(it.id + ':b'); activate(cur); }
 async function addFiles(list){
-  const files = [...list]; if (!files.length || busy) return;
+  let files = [...list]; if (!files.length || busy) return;
+  const tp = files.find(f => /\.ai$/i.test(f.name)); if (tp){ await setTemplate(tp); files = files.filter(f => !/\.ai$/i.test(f.name)); if (!files.length) return; }
   const ok = files.filter(f => /^image\/(png|webp|gif)$/.test(f.type)), made = [];
   if (!ok.length) return toast('투명 배경이 있는 PNG나 WebP 파일을 열어 주세요.');
   const taken = new Set(items.filter(x => !x.isSample).map(x => x.name));
@@ -1350,8 +1362,12 @@ async function buildPdf(){
    일러스트레이터는 다른 프로그램이 만든 PDF의 레이어를 합쳐 버린다. 글자로 된 옛 AI 형식은 레이어가 형식 안에 들어 있어
    그대로 나뉘어 열린다(일러스트레이터에서 열어 확인함). 좌표는 pt, 아래가 0. 투명도가 없으므로 그림은 흰 바탕에 합쳐 넣는다. */
 // 레이어 이름은 한글 Windows/Mac 일러스트레이터가 읽는 완성형(EUC-KR) 바이트로 쓴다
-const AI_KO = { '인쇄':[0xC0, 0xCE, 0xBC, 0xE2], '완칼선':[0xBF, 0xCF, 0xC4, 0xAE, 0xBC, 0xB1] };
-const aiName = t => AI_KO[t] ? Uint8Array.from(AI_KO[t]) : new TextEncoder().encode(t.replace(/[^\x20-\x7e]|[()\\]/g, '_'));
+const AI_KO = { '인':[192,206], '쇄':[188,226], '완':[191,207], '칼':[196,174], '선':[188,177], '재':[192,231], '단':[180,220], '테':[197,215], '스':[189,186], '트':[198,174], '삭':[187,232], '제':[193,166], '금':[177,221], '지':[193,246], '레':[183,185], '이':[192,204], '어':[190,238], '개':[176,179], '별':[186,176], '가':[176,161], '드':[181,229], '라':[182,243], '영':[191,181], '역':[191,170] };
+function aiName(t){
+  const out = [];
+  for (const c of t){ const k = AI_KO[c], n = c.charCodeAt(0); if (k) out.push(k[0], k[1]); else if (c === '(' || c === ')' || c === '\\') out.push(92, n); else out.push(n >= 32 && n < 127 ? n : 95); }
+  return Uint8Array.from(out);
+}
 // SVG 경로 문자열을 AI 경로 명령으로. T는 점 변환, paint는 닫으면서 칠하는 명령(s = 선, f = 면)
 function aiPath(d, T, paint){
   let out = '';
@@ -1386,7 +1402,7 @@ function aiDoc(Wpt, Hpt, layers){
     + '\n%%EndComments\n%%BeginProlog\n%%EndProlog\n%%BeginSetup\n%%EndSetup\n');
   // 레이어 색(선택 표시용): 일러스트레이터 기본 색 목록의 번호와 그 색을 같이 쓴다. 인쇄에는 영향이 없다
   const tint = ['79 128 255', '255 79 79', '79 255 79', '79 79 255', '255 255 79', '255 79 255', '79 255 255'];
-  layers.forEach((l, i) => { const c = i % tint.length; put('%AI5_BeginLayer\n1 1 1 1 0 0 ' + c + ' ' + tint[c] + ' Lb\n('); put(aiName(l.name)); put(') Ln\n0 A\n'); l.body.flat().forEach(put); put('LB\n%AI5_EndLayer--\n'); });
+  layers.forEach((l, i) => { const c = i % tint.length; put('%AI5_BeginLayer\n1 1 ' + (l.lock ? 0 : 1) + ' 1 0 0 ' + c + ' ' + tint[c] + ' Lb\n('); put(aiName(l.name)); put(') Ln\n0 A\n'); l.body.flat().forEach(put); put('LB\n%AI5_EndLayer--\n'); });
   put('%%PageTrailer\ngsave annotatepage grestore showpage\n%%Trailer\n%%EOF\n');
   return new Blob(parts);
 }
@@ -1406,19 +1422,42 @@ async function buildAi(){
    업체 템플릿 규격의 한 판에 여러 조각을 늘어놓는다. 길이 단위는 mm, 원점은 용지 왼쪽 위.
    돔보(재단기 기준 표시)와 레이어 이름은 템플릿 파일에서 그대로 옮긴 값이라 바꾸면 안 된다. */
 const PT = 72 / 25.4;
-const SH = { on:false, file:'sticker_sheet', sel:-1, view:{ scale:1, ox:0, oy:0 }, moved:false, fitted:false,
-  name:'스프몰 조각스티커 330×480', page:[330, 480], area:[25, 50, 270, 405], gap:10, min:[40, 40], max:25,
-  layers:{ print:'인쇄', cut:'완칼선', reg:'SA regmark type2 auto 33 28.35 2.83 28.35 283.46 283.46 0 -2 0.00 0 0.00 0.00', info:'SA info 0 0 0 17.01 1 -16777216 -16777216 1 1 0' }
-};
-const regOps = () => '0.6 0.4 0.4 1 K\n2.835 w\n'
-  + 'q 1 0 0 1 42.5196 70.8662 cm\n0 0 m\n0 -28.347 l\n28.346 -28.347 l\n0 -28.347 l\nS\nQ\n'
-  + 'q 1 0 0 1 836.2204 42.5197 cm\n0 0 m\n28.346 0 l\n28.346 28.347 l\n28.346 0 l\nS\nQ\n'
-  + 'q 1 0 0 1 836.2204 1247.2441 cm\n0 0 m\n28.346 0 l\n28.346 -28.347 l\n28.346 0 l\nS\nQ\n'
-  + 'q 1 0 0 1 42.5196 1218.8976 cm\n0 0 m\n0 28.347 l\n28.346 28.347 l\n0 28.347 l\nS\nQ\n';
+// 규격: 용지(mm), 작업 영역 [x, y, 가로, 세로](mm, 왼쪽 위 기준), 조각 규칙, 레이어(아래에서 위로), 돔보.
+// 돔보는 [시작 x, y, 첫 꺾임 dx, dy, 끝 dx, dy] (pt, 아래가 0)로, 템플릿 파일의 선을 그대로 옮긴 것이다.
+// clear: 안내문이 그림 레이어 안에 들어 있어 내용을 비워야 하는 레이어, hide: 지우지 않고 보이지 않게 꺼 둘 안내용 레이어 (원본 폼파일에 끼워 넣을 때 쓴다)
+// role: print = 그림, cut = 칼선, reg = 돔보, info = 재단기 정보(돔보와 함께 잠가 둔다), 그 밖은 이름만 있는 빈 레이어.
+// 업체가 원본 폼의 레이어를 지우지 말라고 하므로 템플릿의 레이어를 순서까지 모두 그대로 둔다
+const PRESETS = [
+  { id:'soup330', name:'스프몰 조각스티커 330 × 480 (디지털 전용)', page:[330, 480], area:[25, 50, 270, 405], gap:10, min:[40, 40], max:25, regW:2.835, regK:'0.6 0.4 0.4 1',
+    clear:['인쇄'],
+    note:'조각 최소 40 × 40 mm, 최대 25개, 조각 사이 10 mm 이상.', fileHint:'예: 1_낱장_유포지_무광코팅_20장',
+    layers:[{ name:'인쇄', role:'print' }, { name:'완칼선', role:'cut' }, { name:'SA regmark type2 auto 33 28.35 2.83 28.35 283.46 283.46 0 -2 0.00 0 0.00 0.00', role:'reg' }, { name:'SA info 0 0 0 17.01 1 -16777216 -16777216 1 1 0', role:'info' }],
+    marks:[[42.5196, 70.8662, 0, -28.347, 28.346, -28.347], [836.2204, 42.5197, 28.346, 0, 28.346, 28.347], [836.2204, 1247.2441, 28.346, 0, 28.346, -28.347], [42.5196, 1218.8976, 0, 28.347, 28.346, 28.347]] },
+  { id:'soup310', name:'스프몰 조각스티커 310 × 465 (수성 PVC캘지, RGB)', page:[310, 465], area:[27.5, 50, 255, 390], gap:10, min:[40, 40], max:25, regW:2.835, regK:'0 0 0 1',
+    clear:['인쇄'],
+    note:'조각 최소 40 × 40 mm, 최대 25개, 조각 사이 10 mm 이상. 이 템플릿은 RGB 작업용입니다.', fileHint:'예: 1_낱장_유포지_무광코팅_20장',
+    layers:[{ name:'인쇄', role:'print' }, { name:'완칼선', role:'cut' }, { name:'SA regmark type2 auto 33 28.35 2.83 28.35 283.46 283.46 0 -2 0.00 0 0.00 0.00', role:'reg' }, { name:'SA info 0 0 0 17.01 1 -16777216 -16777216 1 1 0', role:'info' }],
+    marks:[[49.6063, 70.8661, 0, -28.346, 28.346, -28.346], [800.7874, 42.5196, 28.346, 0, 28.346, 28.346], [800.7874, 1204.7244, 28.346, 0, 28.346, -28.346], [49.6063, 1176.3779, 0, 28.346, 28.346, 28.346]] },
+  // 모다82: 작업 영역은 템플릿 가이드라인 레이어의 안쪽 안내선, 규칙은 업체 주문 안내문에서 가져왔다
+  { id:'moda82', hide:['가이드라인'], name:'모다82 PVC캘지 레트로 423 × 300 (완칼)', page:[423, 300], area:[21.15, 22.89, 347.65, 255.05], gap:4, min:[30, 30], max:45, regW:2.26772, regK:'0 0 0 1',
+    note:'완칼 최소 약 30 × 30 mm, 한 판에 최대 45개, 완칼선 사이 4 mm 이상. 완칼선은 재단 레이어에 들어갑니다. 뾰족한 곳 없이 둥글게, 완칼선 안에 또 완칼선은 안 됩니다.',
+    fileHint:'예: 1이름_캘흰_파스텔B_무광5_칼선커팅_개별재단',
+    layers:[{ name:'가이드라인' }, { name:'테스트칼선(삭제금지)' }, { name:'인쇄', role:'print' }, { name:'칼선' }, { name:'재단', role:'cut' }, { name:'SA regmark type2 auto 33 0.00 2.27 28.35 283.46 283.46 0 -1 0.00 0 0.00 0.00', role:'reg' }, { name:'SA info 0 0 0 17.01 2 -16777216 -16777216 1 1 0', role:'info' }, { name:'<레이어>' }],
+    marks:[[33, 59.0132, 0, -28.3465, 28.3465, -28.3465], [1051.6459, 30.6667, 28.3465, 0, 28.3465, 28.3465], [1051.6459, 819, 28.3465, 0, 28.3465, -28.3465], [33, 790.6535, 0, 28.3465, 28.3465, 28.3465]] },
+  // 모다82 캘지 리무버블: 용지와 작업 영역은 레트로와 같고, 레이어 이름과 돔보(더 작고 가늘다)가 다르다
+  { id:'moda82r', hide:['가이드라인', '인쇄영역'], name:'모다82 캘지 리무버블 423 × 300 (완칼)', page:[423, 300], area:[21.15, 22.89, 347.65, 255.05], gap:4, min:[30, 30], max:45, regW:1.70079, regK:'0.74902 0.678431 0.670588 0.901961',
+    note:'완칼 최소 약 30 × 30 mm, 한 판에 최대 45개, 완칼선 사이 4 mm 이상. 완칼선은 개별재단 레이어에 들어갑니다. 규칙은 모다82 주문 안내문의 완칼 항목을 그대로 적용했습니다.',
+    fileHint:'예: 1이름_수성리무버블_파스텔B_무광5_칼선커팅_개별재단',
+    layers:[{ name:'가이드라인' }, { name:'인쇄영역' }, { name:'인쇄레이어', role:'print' }, { name:'칼선레이어' }, { name:'개별재단', role:'cut' }, { name:'SA regmark type2 auto 33 0.00 1.70 22.68 283.46 283.46 0 -1 0.00 0 0.00 0.00', role:'reg' }, { name:'SA info 0 0 0 17.01 2 -424956481 -16777216 1 1 0', role:'info' }],
+    marks:[[35.297, 61.7999, 0, -22.6771, 22.6772, -22.6771], [1049.1347, 39.1228, 22.6772, 0, 22.6772, 22.6771], [1049.1347, 811.8752, 22.6772, 0, 22.6772, -22.6771], [35.297, 789.1981, 0, 22.6771, 22.6772, 22.6771]] }
+];
+const SH = { on:false, file:'sticker_sheet', sel:-1, view:{ scale:1, ox:0, oy:0 }, moved:false, fitted:false };
+function setPreset(id){ const q = PRESETS.find(x => x.id === id) || PRESETS[0]; Object.assign(SH, { P:q, name:q.name, page:q.page, area:q.area, gap:q.gap, min:q.min, max:q.max }); }
+setPreset('soup330');
+const regPts = ([x, y, ax, ay, bx, by]) => [[x, y], [x + ax, y + ay], [x + bx, y + by], [x + ax, y + ay]];   // 선을 긋는 순서 그대로
+const regOps = () => SH.P.regK + ' K\n' + SH.P.regW + ' w\n' + SH.P.marks.map(m => regPts(m).map((q, i) => pdfN(q[0]) + ' ' + pdfN(q[1]) + (i ? ' l\n' : ' m\n')).join('') + 'S\n').join('');
 // 돔보 선을 화면에 그릴 때 쓰는 점들 (mm, 위가 0)
-const regLines = () => [[[42.5196, 70.8662], [42.5196, 42.5192], [70.8656, 42.5192]], [[836.2204, 42.5197], [864.5664, 42.5197], [864.5664, 70.8667]],
-  [[836.2204, 1247.2441], [864.5664, 1247.2441], [864.5664, 1218.8971]], [[42.5196, 1218.8976], [42.5196, 1247.2446], [70.8656, 1247.2446]]]
-  .map(l => l.map(([x, y]) => [x / PT, SH.page[1] - y / PT]));
+const regLines = () => SH.P.marks.map(m => regPts(m).slice(0, 3).map(([x, y]) => [x / PT, SH.page[1] - y / PT]));
 const itemPxmm = it => (it.dpiSrc === 'common' ? G.dpi : it.dpi) / 25.4;
 // 조각 목록: 이미지마다 수량만큼. 크기는 칼선 바깥 상자 기준
 function pieces(){
@@ -1497,7 +1536,9 @@ const cleanName = t => t.replace(/[\\/:*?"<>|\x00-\x1f]/g, '').replace(/\s+/g, '
 function syncSheet(){
   if (document.activeElement !== $('sh-file')) $('sh-file').value = SH.file;
   const list = pieces(), iss = sheetIssues(list), sel = list[SH.sel], w = [], cnt = k => iss.filter(r => r[k]).length;
-  $('sh-count').textContent = '합계 ' + list.length + ' / ' + SH.max;
+  $('sh-count').textContent = '합계 ' + list.length + (isFinite(SH.max) ? ' / ' + SH.max : '');
+  const tp = TPL[SH.P.id]; $('tpl-state').textContent = tp ? '넣음: ' + tp.name : '없음'; $('tpl-state').classList.toggle('bad', !tp); $('btn-tpl').textContent = tp ? '다른 파일로 바꾸기' : '원본 폼파일 넣기';
+  $('sh-preset').value = SH.P.id; $('sh-file').placeholder = SH.P.fileHint; $('sh-file-hint').textContent = '업체가 파일 이름에 작업 내용을 적어 달라고 합니다. ' + SH.P.fileHint; $('sh-spec').textContent = '용지 ' + SH.page[0] + ' × ' + SH.page[1] + ' mm, 작업 영역(점선) ' + SH.area[2] + ' × ' + SH.area[3] + ' mm. ' + SH.P.note;
   if (list.length > SH.max) w.push('조각이 ' + list.length + '개입니다. 한 판에 ' + SH.max + '개까지만 넣을 수 있습니다.');
   if (cnt('s')) w.push('최소 크기 ' + SH.min[0] + ' × ' + SH.min[1] + ' mm보다 작은 조각이 ' + cnt('s') + '개 있습니다.');
   if (cnt('o')) w.push('작업 영역을 벗어난 조각이 ' + cnt('o') + '개 있습니다.');
@@ -1534,8 +1575,8 @@ function dupSel(){ const p = pieces()[SH.sel]; if (!p) return; if (!addCopy(p.it
 function delSel(){ const p = pieces()[SH.sel]; if (!p) return; removeCopy(p.it, p.i); SH.sel = Math.min(SH.sel, pieces().length - 1); sheetChanged(); }
 function fillSel(){
   const p = pieces()[SH.sel]; if (!p) return; let n = 0;
-  while (pieces().length < SH.max){ const { w, h } = itemSize(p.it), spot = findSpot(w, h); if (!spot) break; p.it.pos.push(spot); p.it.sn = p.it.pos.length; n++; }
-  toast(n ? n + '장을 더 놓았습니다.' : pieces().length >= SH.max ? '이미 ' + SH.max + '개를 다 채웠습니다.' : '더 놓을 빈자리가 없습니다.'); sheetChanged();
+  while (pieces().length < Math.min(SH.max, 200)){ const { w, h } = itemSize(p.it), spot = findSpot(w, h); if (!spot) break; p.it.pos.push(spot); p.it.sn = p.it.pos.length; n++; }
+  toast(n ? n + '장을 더 놓았습니다.' : pieces().length >= Math.min(SH.max, 200) ? '이미 ' + Math.min(SH.max, 200) + '개를 다 채웠습니다.' : '더 놓을 빈자리가 없습니다.'); sheetChanged();
 }
 function drawSheet(){
   const dpr = window.devicePixelRatio || 1, v = SH.view, cw = cv.width / dpr, ch = cv.height / dpr, [PW, PH] = SH.page, [ax, ay, aw, ah] = SH.area;
@@ -1586,33 +1627,127 @@ async function buildSheetPdf(){
       + 'q ' + S.w + ' 0 0 ' + -S.h + ' 0 ' + S.h + ' cm /Im' + ids.get(p.it) + ' Do Q\nQ\n';
     cut += 'q\n' + M + ' cm\n0 1 0 0 K ' + n(.25 / a) + ' w 1 j\n' + pdfPath(pathD(0, 0)) + 'S\nQ\n';
   }
-  w.layer(SH.layers.print, print); w.layer(SH.layers.cut, cut); w.layer(SH.layers.reg, regOps()); w.layer(SH.layers.info, '');
+  for (const l of SH.P.layers) w.layer(l.name, l.role === 'print' ? print : l.role === 'cut' ? cut : l.role === 'reg' ? regOps() : '');
   return w.finish(PW * PT, Hpt);
 }
-function buildSheetAi(){
-  const [PW, PH] = SH.page, Hpt = PH * PT, print = [], cut = [];
+// 조각들의 그림과 칼선을 AI 명령으로. (dx, dy)는 파일 좌표의 원점 차이(pt)
+function sheetOps(dx, dy){
+  const Hpt = SH.page[1] * PT, print = [], cut = [];
   for (const p of pieces()){
     load(p.it);
     // 조각 하나를 흰 바탕의 그림 한 장으로: 배경색(도련 포함)과 그림을 합친다
     const m = summarize(S.bleedLoops || S.loops), x0 = Math.floor(m.x0), y0 = Math.floor(m.y0), [c, x] = whiteCanvas(Math.ceil(m.x1) - x0, Math.ceil(m.y1) - y0);
     x.translate(-x0, -y0); if (S.bg !== 'none') paintBg(x, S.bleedPath || S.path, 0, 0); x.drawImage(S.img, 0, 0);
     const mmx = px => p.x + (px - p.it.bb.x0) * p.f, mmy = py => p.y + (py - p.it.bb.y0) * p.f;   // 그림 px → 용지 mm
-    print.push(aiRaster(c, mmx(x0) * PT, Hpt - mmy(y0) * PT, p.f * PT));
-    cut.push(aiPath(pathD(0, 0), (px, py) => [mmx(px) * PT, Hpt - mmy(py) * PT], 's'));
+    print.push(aiRaster(c, mmx(x0) * PT + dx, Hpt - mmy(y0) * PT + dy, p.f * PT));
+    cut.push(aiPath(pathD(0, 0), (px, py) => [mmx(px) * PT + dx, Hpt - mmy(py) * PT + dy], 's'));
   }
-  const reg = '0 i 0 J 0 j 2.835 w 4 M []0 d\n0 R\n0.6 0.4 0.4 1 K\n'
-    + [[42.5196, 70.8662, 0, -28.347, 28.346, -28.347], [836.2204, 42.5197, 28.346, 0, 28.346, 28.347], [836.2204, 1247.2441, 28.346, 0, 28.346, -28.347], [42.5196, 1218.8976, 0, 28.347, 28.346, 28.347]]
-      .map(([x, y, ax, ay, bx, by]) => pdfN(x) + ' ' + pdfN(y) + ' m\n' + pdfN(x + ax) + ' ' + pdfN(y + ay) + ' L\n' + pdfN(x + bx) + ' ' + pdfN(y + by) + ' L\n' + pdfN(x + ax) + ' ' + pdfN(y + ay) + ' L\nS\n').join('');
-  return aiDoc(PW * PT, Hpt, [{ name:SH.layers.print, body:print }, { name:SH.layers.cut, body:[AI_STROKE, ...cut] }, { name:SH.layers.reg, body:[reg] }, { name:SH.layers.info, body:[] }]);
+  return { print, cut };
+}
+// 원본 폼파일이 없을 때: 새 파일을 만들고 돔보를 같은 자리에 다시 그린다
+function buildSheetAi(){
+  const [PW, PH] = SH.page, Hpt = PH * PT, { print, cut } = sheetOps(0, 0);
+  const reg = '0 i 0 J 0 j ' + SH.P.regW + ' w 4 M []0 d\n0 R\n' + SH.P.regK + ' K\n'
+    + SH.P.marks.map(m => regPts(m).map((q, i) => pdfN(q[0]) + ' ' + pdfN(q[1]) + (i ? ' L\n' : ' m\n')).join('') + 'S\n').join('');
+  return aiDoc(PW * PT, Hpt, SH.P.layers.map(l => ({ name:l.name, lock:l.role === 'reg' || l.role === 'info', body:l.role === 'print' ? print : l.role === 'cut' ? [AI_STROKE, ...cut] : l.role === 'reg' ? [reg] : [] })));
+}
+/* ---------- 원본 폼파일에 끼워 넣기 ----------
+   업체가 준 AI 파일 안에는 일러스트레이터가 읽는 원본 데이터가 압축되어 들어 있다(첫 블록은 머리말, 나머지는 zlib 조각).
+   그것을 풀어 그림 레이어와 칼선 레이어의 닫는 줄(LB) 앞에 명령만 써넣고 다시 압축한다. 돔보와 그 밖의 레이어는 원본 그대로 남는다. */
+const TPL = {};   // 규격 id → { name, bytes }
+const B = t => new TextEncoder().encode(t);
+function bfind(h, n, from = 0){ const m = n.length, f = n[0], last = h.length - m; for (let i = from; i <= last; i++){ if (h[i] !== f) continue; let j = 1; while (j < m && h[i + j] === n[j]) j++; if (j === m) return i; } return -1; }
+function brfind(h, n, before){ const m = n.length; for (let i = Math.min(before, h.length) - m; i >= 0; i--){ let j = 0; while (j < m && h[i + j] === n[j]) j++; if (j === m) return i; } return -1; }
+function bcat(list){ let n = 0; for (const a of list) n += a.length; const o = new Uint8Array(n); let p = 0; for (const a of list){ o.set(a, p); p += a.length; } return o; }
+async function inflate(u8){ const ds = new DecompressionStream('deflate'), w = ds.writable.getWriter(); w.write(u8); w.close(); return new Uint8Array(await new Response(ds.readable).arrayBuffer()); }
+const aiKey = name => bcat([B('('), B(name.replace(/[\\()]/g, '\\$&')), B(') Ln')]);   // 원본 데이터 안의 레이어 이름 표기
+async function openTemplate(bytes){
+  if (!window.PDFLib || !window.DecompressionStream) throw new Error('nolib');
+  const { PDFDocument, PDFName, decodePDFRawStream } = PDFLib, N = t => PDFName.of(t);
+  const doc = await PDFDocument.load(bytes, { updateMetadata:false }), size = doc.getPage(0).getSize();
+  const priv = doc.getPage(0).node.lookup(N('PieceInfo')).lookup(N('Illustrator')).lookup(N('Private')), n = priv.lookup(N('NumBlock')).asNumber(), blocks = [];
+  for (let i = 1; i <= n; i++) blocks.push(decodePDFRawStream(priv.lookup(N('AIPrivateData' + i))).decode());
+  const d = bcat(blocks), mark = B('%AI12_CompressedData'), j = bfind(d, mark); if (j < 0) throw new Error('fmt');
+  return { doc, priv, n, head:d.slice(0, j + mark.length), raw:await inflate(d.subarray(j + mark.length)), page:[size.width / PT, size.height / PT] };
+}
+// 폼파일이 어느 규격의 것인지: 용지 크기와 돔보 레이어 이름으로 가린다
+const presetOf = t => PRESETS.find(q => Math.abs(q.page[0] - t.page[0]) < .6 && Math.abs(q.page[1] - t.page[1]) < .6 && bfind(t.raw, aiKey(q.layers.find(l => l.role === 'reg').name)) >= 0);
+async function setTemplate(file){
+  if (!file || busy) return;
+  let t; const bytes = new Uint8Array(await file.arrayBuffer());
+  try { t = await openTemplate(bytes); } catch (e){ return toast(e.message === 'nolib' ? '이 브라우저에서는 폼파일을 읽을 수 없습니다. 인터넷 연결을 확인하고 최신 Chrome이나 Edge에서 열어 주세요.' : '업체 폼파일(.ai)로 읽히지 않습니다. 업체에서 받은 원본 파일을 그대로 넣어 주세요.'); }
+  const q = presetOf(t); if (!q) return toast('이 폼파일에 맞는 규격이 아직 없습니다. 지원하는 규격: ' + PRESETS.map(x => x.name).join(', '));
+  TPL[q.id] = { name:file.name, bytes }; putImg('tpl:' + q.id, { name:file.name, blob:new Blob([bytes]) });
+  if (SH.on && SH.P.id !== q.id){ setPreset(q.id); arrange(); SH.sel = pieces().length ? 0 : -1; $('chip-file').textContent = SH.name; fitSheet(); }
+  if (SH.on) syncSheet(); toast(q.name + ' 폼파일을 넣었습니다.');
+}
+async function loadTemplates(){
+  for (const q of PRESETS){ try { const v = await idb('img', 'readonly', o => o.get('tpl:' + q.id)); if (v && v.blob) TPL[q.id] = { name:v.name, bytes:new Uint8Array(await v.blob.arrayBuffer()) }; } catch (e){} }
+}
+async function buildSheetInject(){
+  const t = await openTemplate(TPL[SH.P.id].bytes), { PDFName, PDFNumber } = PDFLib, N = x => PDFName.of(x), P = SH.P;
+  let raw = t.raw;
+  const eol = bfind(raw, B('\r\n')) >= 0 ? B('\r\n') : bfind(raw, B('\r')) >= 0 ? B('\r') : B('\n');
+  // 파일 좌표의 원점: 대지 왼쪽 아래 모서리가 원본 데이터에서 어디인지
+  const c = bfind(raw, B('%AI3_Cropmarks:')), crop = c < 0 ? [0, 0] : String.fromCharCode(...raw.subarray(c + 15, c + 90)).trim().split(/\s+/).map(Number), ops = sheetOps(crop[0] || 0, crop[1] || 0);
+  const BEG = B('%AI5_BeginLayer'), END = B('%AI5_EndLayer--');
+  // 이름으로 레이어를 찾아 시작, 끝, 닫는 줄(LB), 안에 든 하위 레이어의 끝을 돌려준다
+  const range = name => {
+    const k = bfind(raw, aiKey(name)); if (k < 0) throw new Error('layer:' + name);
+    const begin = brfind(raw, BEG, k); let depth = 1, pos = begin + BEG.length, nested = -1, end = -1;
+    while (depth > 0){
+      const nb = bfind(raw, BEG, pos), ne = bfind(raw, END, pos); if (ne < 0) throw new Error('fmt');
+      if (nb >= 0 && nb < ne){ depth++; pos = nb + BEG.length; } else { depth--; pos = ne + END.length; if (depth === 0) end = ne; else if (depth === 1) nested = pos; }
+    }
+    const close = brfind(raw, B('LB'), end); if (close < begin) throw new Error('fmt');
+    return { begin, close, nested };
+  };
+  // 레이어 상태는 세 군데에 적혀 있다: 상태 줄(Lb)의 숫자, 그 아래 잠금(A)·숨김(Xw) 줄, 문서 머리의 보기 상태(OpenViewLayers)
+  // 일러스트레이터에서 확인한 결과: 숨김은 보기 상태 한 곳만 바꿔야 한다(다른 줄을 건드리면 옆 레이어까지 꺼진다). 잠금은 세 곳을 함께 바꾼다
+  const state = (name, o) => {
+    const b = range(name).begin; let p = b + BEG.length; while (raw[p] === 13 || raw[p] === 10) p++;
+    const dig = (q, v) => { if (raw[q] === 48 || raw[q] === 49) raw[q] = v ? 49 : 48; };
+    const xw = bfind(raw, B(' Xw'), p), a = xw < 0 ? -1 : brfind(raw, B(' A'), xw);
+    if (o.lock !== undefined){ dig(p + 4, !o.lock); if (a > b) dig(a - 1, o.lock); }
+    // 보기 상태: 위 레이어부터 한 자리씩, 1 = 보임, 4 = 잠기지 않음
+    const v = bfind(raw, B('%AI5_OpenViewLayers:')); if (v < 0) return;
+    let q = v + 20; while (raw[q] === 32) q++; let n = 0; while (raw[q + n] >= 48 && raw[q + n] <= 55) n++;
+    let total = 0, idx = -1; for (let k = bfind(raw, BEG); k >= 0; k = bfind(raw, BEG, k + 1)){ if (k === b) idx = total; total++; }
+    if (n !== total || idx < 0) return;
+    const at = q + n - 1 - idx; let d = raw[at] - 48;
+    if (o.hide !== undefined) d = o.hide ? d & ~1 : d | 1;
+    if (o.lock !== undefined) d = o.lock ? d & ~4 : d | 4;
+    raw[at] = 48 + d;
+  };
+  const splice = (from, to, add) => { raw = bcat([raw.subarray(0, from), add, raw.subarray(to)]); };
+  const lines = parts => { const all = bcat(parts.flat().map(q => typeof q === 'string' ? B(q) : q)); if (eol.length === 1){ if (eol[0] !== 10) for (let i = 0; i < all.length; i++) if (all[i] === 10) all[i] = eol[0]; return all; }
+    let n = 0; for (let i = 0; i < all.length; i++) if (all[i] === 10) n++; const out = new Uint8Array(all.length + n); for (let i = 0, o = 0; i < all.length; i++){ if (all[i] === 10) out[o++] = 13; out[o++] = all[i]; } return out; };
+  for (const name of P.hide || []) state(name, { hide:true });
+  for (const name of P.clear || []){ const r = range(name); if (r.nested >= 0){ let a = r.nested; while (raw[a] === 13 || raw[a] === 10) a++; splice(a, r.close, new Uint8Array(0)); } }
+  for (const l of P.layers) if (l.role === 'print' || l.role === 'cut'){
+    state(l.name, { hide:false, lock:false });   // 그림과 칼선 레이어는 보이고 잠기지 않게
+    const r = range(l.name); splice(r.close, r.close, lines(l.role === 'print' ? ops.print : [AI_STROKE, ...ops.cut]));
+  }
+  const comp = await deflate(raw), blocks = [t.head];
+  for (let k = 0; k < comp.length; k += 65536) blocks.push(comp.subarray(k, k + 65536));
+  for (let i = 1; i <= Math.max(t.n, blocks.length); i++){
+    const key = N('AIPrivateData' + i), old = t.priv.get(key); if (old && old.objectNumber !== undefined) t.doc.context.delete(old); t.priv.delete(key);
+    if (i <= blocks.length) t.priv.set(key, t.doc.context.register(t.doc.context.stream(blocks[i - 1])));
+  }
+  t.priv.set(N('NumBlock'), PDFNumber.of(blocks.length));
+  return new Blob([await t.doc.save({ useObjectStreams:false })]);
 }
 async function saveSheet(kind){
   const list = pieces();
   if (!list.length) return toast('시트에 놓을 조각이 없습니다.');
   if (items.some(it => it.isSample)) return toast('예시 이미지는 저장되지 않습니다. 이미지를 열어 주세요.');
   busy = true; $('app').inert = true;
-  let blob; try { blob = kind === 'ai' ? buildSheetAi() : await buildSheetPdf(); } finally { load(items[cur]); busy = false; $('app').inert = false; }
+  const inj = kind === 'ai' && !!TPL[SH.P.id];
+  let blob; try { blob = inj ? await buildSheetInject() : kind === 'ai' ? buildSheetAi() : await buildSheetPdf(); } finally { load(items[cur]); busy = false; $('app').inert = false; }
   const bad = !$('sh-warn').hidden;
-  if (await save(SH.file + '.' + kind, blob) && bad) toast('저장했습니다. 규격에 맞지 않는 조각이 있으니 확인해 주세요.');
+  if (!(await save(SH.file + '.' + kind, blob))) return;
+  if (bad) toast('저장했습니다. 규격에 맞지 않는 조각이 있으니 확인해 주세요.');
+  else if (kind === 'ai' && !inj) toast('저장했습니다. 원본 폼파일이 없어 돔보를 새로 그렸습니다. 업체에 내려면 원본 폼파일을 넣고 다시 저장하세요.');
 }
 async function buildPngs(){
   const P = exportPad(), W = S.w + 2*P, H = S.h + 2*P;
@@ -1704,7 +1839,7 @@ function saveNote(ok){ const e = $('save-note'); e.textContent = ok ? '자동 �
 function persist(){ if (!db || restoring) return; clearTimeout(saveT); saveT = setTimeout(saveState, 700); }
 async function saveState(){
   if (busy || pending) return persist();
-  const st = { v:1, G, prod:PROD, cur, sheetFile:SH.file, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, edits:it.edits, back:it.back ? it.back.name : null })) };
+  const st = { v:1, G, prod:PROD, cur, sheetFile:SH.file, preset:SH.P.id, items:items.filter(it => !it.isSample).map(it => ({ id:it.id, name:it.name, dpi:it.dpi, dpiSrc:it.dpiSrc, own:it.own, sn:it.sn, sw:it.sw, pos:it.pos, edits:it.edits, back:it.back ? it.back.name : null })) };
   try { await idb('kv', 'readwrite', o => o.put(st, 'state')); saveNote(true); } catch (e){ saveNote(false); }
 }
 async function putImg(key, blob){ if (!db) return; try { await idb('img', 'readwrite', o => o.put(blob, key)); } catch (e){ saveNote(false); } }
@@ -1712,7 +1847,7 @@ async function delImg(key){ if (!db) return; try { await idb('img', 'readwrite',
 function showProd(){ $('prod-' + PROD).checked = true; document.querySelector('.side').dataset.prod = PROD; $('mode-wrap').hidden = PROD !== 'sticker'; $('acr-title').textContent = PROD === 'keyring' ? '아크릴 키링' : '코롯토'; }
 async function restore(){
   db = await openDb(); if (!db){ saveNote(false); return false; }
-  saveNote(true);
+  saveNote(true); await loadTemplates();
   const get = (store, key) => idb(store, 'readonly', o => o.get(key)).catch(() => null), st = await get('kv', 'state');
   if (!st || !st.items || !st.items.length) return false;
   const made = [];
@@ -1728,7 +1863,7 @@ async function restore(){
     made.push(it);
   }
   if (!made.length) return false;
-  if (st.sheetFile) SH.file = st.sheetFile;
+  if (st.sheetFile) SH.file = st.sheetFile; if (st.preset) setPreset(st.preset);
   Object.assign(G, st.G); PROD = ['sticker', 'keyring', 'korotto'].includes(st.prod) ? st.prod : 'sticker';
   items.length = 0; items.push(...made); showProd(); activate(Math.min(st.cur || 0, items.length - 1)); return true;
 }
@@ -1739,8 +1874,9 @@ async function clearAll(){
   if (!clearT){ b.textContent = '한 번 더 누르면 비웁니다'; clearT = setTimeout(() => { clearT = 0; b.textContent = '모두 비우기'; }, 3000); return; }
   clearTimeout(clearT); clearT = 0; b.textContent = '모두 비우기'; if (busy) return; flush();
   for (const it of items){ if (it.file) URL.revokeObjectURL(it.url); if (it.back) URL.revokeObjectURL(it.back.url); }
-  if (db) try { await idb('img', 'readwrite', o => o.clear()); await idb('kv', 'readwrite', o => o.clear()); } catch (e){}
-  if (SH.on) leaveSheet(); SH.sel = -1; SH.fitted = false; SH.file = 'sticker_sheet'; items.length = 0;
+  for (const it of items){ delImg(it.id); delImg(it.id + ':b'); }   // 넣어 둔 업체 폼파일은 남긴다
+  if (db) try { await idb('kv', 'readwrite', o => o.clear()); } catch (e){}
+  if (SH.on) leaveSheet(); SH.sel = -1; SH.fitted = false; SH.file = 'sticker_sheet'; setPreset('soup330'); items.length = 0;
   Object.assign(G, JSON.parse(JSON.stringify(G0))); PROD = 'sticker'; showProd();   // 설정도 처음 값으로
   sample(); toast('모두 비웠습니다.');
 }
@@ -1825,6 +1961,10 @@ $('fname').addEventListener('change', e => {
 });
 $('sh-file').addEventListener('change', e => { const t = cleanName(e.target.value); if (t) SH.file = t; e.target.blur(); e.target.value = SH.file; persist(); });
 for (const k of ['fname', 'sh-file']) $(k).addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+for (const q of PRESETS){ const o = document.createElement('option'); o.value = q.id; o.textContent = q.name; $('sh-preset').append(o); }
+$('sh-preset').addEventListener('change', e => { setPreset(e.target.value); arrange(); SH.sel = pieces().length ? 0 : -1; $('chip-file').textContent = SH.name; syncSheet(); fitSheet(); });
+$('btn-tpl').addEventListener('click', () => $('tpl-input').click());
+$('tpl-input').addEventListener('change', e => { setTemplate(e.target.files[0]); e.target.value = ''; });
 $('btn-fill').addEventListener('click', fillSel); $('btn-dup').addEventListener('click', dupSel); $('btn-del').addEventListener('click', delSel);
 addEventListener('keydown', e => {
   if (!SH.on || busy || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
